@@ -7,6 +7,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
 public class GameProcessor {
+
+    private final int boardSize;
     private BoardModel myShips;
     private BoardModel opponentShips;
 
@@ -40,6 +42,7 @@ public class GameProcessor {
     };
 
     public GameProcessor(int boardSize) {
+        this.boardSize = boardSize;
         myShips = new BoardModel(boardSize);
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
@@ -72,5 +75,9 @@ public class GameProcessor {
                 myShips.toggleIsShip(point.x, point.y);
             }
         };
+    }
+
+    public int getBoardSize() {
+        return boardSize;
     }
 }

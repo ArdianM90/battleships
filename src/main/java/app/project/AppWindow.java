@@ -14,9 +14,11 @@ public class AppWindow extends JFrame {
 
     private static final int BOARD_SIZE = 12;
 
-    private CardLayout cardLayout;
-    private JPanel cardPanel;
-    private GameProcessor gameProcessor;
+    private final CardLayout cardLayout;
+    private final JPanel cardPanel;
+    private final GameProcessor gameProcessor;
+
+    private SocketNetworkHandler networkHandler;
 
     public AppWindow() {
         setTitle("BattleShips");
@@ -28,21 +30,28 @@ public class AppWindow extends JFrame {
 
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
-        cardPanel.add(new MainMenu(this::showCreatorWindow), MAIN_MENU.name());
-        cardPanel.add(new ShipsSetup(BOARD_SIZE, gameProcessor, this::showGameWindow), SHIPS_SETUP.name());
-        cardPanel.add(new GameView(BOARD_SIZE, gameProcessor), GAME.name());
+        cardPanel.add(new MainMenu(this::setNetworkHandler, this::switchToShipsSetupWindow, this::switchToGameWindow), MAIN_MENU.name());
 
         add(cardPanel);
         setVisible(true);
     }
 
-    private void showCreatorWindow() {
-        cardLayout.show(cardPanel, SHIPS_SETUP.name());
-        System.out.println("W: " + getWidth() + ", H: " + getHeight());
+    private void setNetworkHandler(SocketNetworkHandler handler) {
+        this.networkHandler = handler;
     }
 
-    private void showGameWindow() {
-        cardLayout.show(cardPanel, GAME.name());
-        System.out.println("W: " + getWidth() + ", H: " + getHeight());
+    private void switchToShipsSetupWindow() {
+        System.out.println("Wywołuję showCreatorWindow()");
+
+        ShipsSetup shipsSetup = new ShipsSetup(networkHandler, gameProcessor, this::switchToGameWindow);
+        cardPanel.add(shipsSetup, SHIPS_SETUP.name());
+        SwingUtilities.invokeLater(() -> cardLayout.show(cardPanel, SHIPS_SETUP.name()));
     }
+
+    private void switchToGameWindow() {
+        cardPanel.add(new GameView(gameProcessor), GAME.name());
+        SwingUtilities.invokeLater(() -> cardLayout.show(cardPanel, GAME.name()));
+        System.out.println("Wywołuję showGameWindow()");
+    }
+
 }

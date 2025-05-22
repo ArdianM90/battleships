@@ -11,20 +11,20 @@ import static app.project.model.BoardType.OPPONENT_BOARD;
 
 public class Board extends JPanel {
 
-    private JButton[][] rectsArr;
-    private boolean isOpponentBoard;
-    private int buttonSize = 35;
+    private static final int BUTTON_SIZE = 35;
+
+    private final boolean isOpponentBoard;
     BiPredicate<Point, Boolean> isShipFunction;
     BiConsumer<Point, Boolean> toggleShipFunction;
 
-    public Board(int size, BoardType boardType, BiPredicate<Point, Boolean> isShipFunction, BiConsumer<Point, Boolean> toggleShipFunction) {
+    public Board(BoardType boardType, int size, BiPredicate<Point, Boolean> isShipFunction, BiConsumer<Point, Boolean> toggleShipFunction) {
         this.isShipFunction = isShipFunction;
         this.toggleShipFunction = toggleShipFunction;
         this.isOpponentBoard = boardType.equals(OPPONENT_BOARD);
 
-        rectsArr = new JButton[size][size];
+        JButton[][] rectsArr = new JButton[size][size];
         setLayout(new GridLayout(size, size, 1, 1));
-        setPreferredSize(new Dimension((buttonSize + 1) * size, (buttonSize + 1) * size));
+        setPreferredSize(new Dimension((BUTTON_SIZE + 1) * size, (BUTTON_SIZE + 1) * size));
 
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
@@ -40,7 +40,7 @@ public class Board extends JPanel {
         button.setBackground(isShipFunction.test(new Point(row, col), isOpponentBoard) ? Color.RED : Color.BLUE);
         button.setOpaque(true);
         button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        button.setPreferredSize(new Dimension(buttonSize, buttonSize));
+        button.setPreferredSize(new Dimension(BUTTON_SIZE, BUTTON_SIZE));
 
         button.addActionListener(e -> {
             toggleShipFunction.accept(new Point(row, col), isOpponentBoard);

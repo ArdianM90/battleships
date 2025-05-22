@@ -10,15 +10,12 @@ import static app.project.model.BoardType.PLAYER_BOARD;
 
 public class GameView extends JPanel {
 
-    private Board myBoard;
-    private Board opponentBoard;
-
-    public GameView(int boardSize, GameProcessor gameProcessor) {
+    public GameView(GameProcessor gameProcessor) {
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 
-        myBoard = new Board(boardSize, PLAYER_BOARD, gameProcessor.isShipFunction(), gameProcessor.toggleShipFunction());
-        opponentBoard = new Board(boardSize, OPPONENT_BOARD, gameProcessor.isShipFunction(), gameProcessor.toggleShipFunction());
+        Board myBoard = new Board(PLAYER_BOARD, gameProcessor.getBoardSize(), gameProcessor.isShipFunction(), gameProcessor.toggleShipFunction());
+        Board opponentBoard = new Board(OPPONENT_BOARD, gameProcessor.getBoardSize(), gameProcessor.isShipFunction(), gameProcessor.toggleShipFunction());
 
         JPanel labelsPanel = new JPanel(new GridLayout(1, 2));
         labelsPanel.add(new JLabel("Twoja plansza"));
