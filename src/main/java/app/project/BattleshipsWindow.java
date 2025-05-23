@@ -1,6 +1,7 @@
 package app.project;
 
-import app.project.controller.GameProcessor;
+import app.project.controller.GameController;
+import app.project.controller.networking.SocketNetworkHandler;
 import app.project.view.GameView;
 import app.project.view.MainMenu;
 import app.project.view.ShipsSetup;
@@ -10,27 +11,28 @@ import java.awt.*;
 
 import static app.project.model.AppStage.*;
 
-public class AppWindow extends JFrame {
+public class BattleshipsWindow extends JFrame {
 
     private static final int BOARD_SIZE = 12;
 
     private final CardLayout cardLayout;
     private final JPanel cardPanel;
-    private final GameProcessor gameProcessor;
+    private final GameController gameController;
 
     private SocketNetworkHandler networkHandler;
 
-    public AppWindow() {
+    public BattleshipsWindow() {
         setTitle("BattleShips");
         setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(true);
-        gameProcessor = new GameProcessor(BOARD_SIZE);
+        gameController = new GameController(BOARD_SIZE);
 
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
-        cardPanel.add(new MainMenu(this::setNetworkHandler, this::switchToShipsSetupWindow, this::switchToGameWindow), MAIN_MENU.name());
+        MainMenu mainMenu = new MainMenu(this::setNetworkHandler, this::switchToShipsSetupWindow, this::switchToGameWindow);
+        cardPanel.add(mainMenu, MAIN_MENU.name());
 
         add(cardPanel);
         setVisible(true);
@@ -43,15 +45,17 @@ public class AppWindow extends JFrame {
     private void switchToShipsSetupWindow() {
         System.out.println("Wywołuję showCreatorWindow()");
 
-        ShipsSetup shipsSetup = new ShipsSetup(networkHandler, gameProcessor, this::switchToGameWindow);
+        ShipsSetup shipsSetup = new ShipsSetup(networkHandler, gameController);
         cardPanel.add(shipsSetup, SHIPS_SETUP.name());
         SwingUtilities.invokeLater(() -> cardLayout.show(cardPanel, SHIPS_SETUP.name()));
     }
 
     private void switchToGameWindow() {
-        cardPanel.add(new GameView(gameProcessor), GAME.name());
+        GameView gameView = new GameView(gameController);
+        cardPanel.add(gameView, GAME.name());
+        gameController.setMyBoardShotFunction(gameView.myBoardShotFunction());
+        gameController.setFoeBoardShotFunction(gameView.foeBoardShotFunction());
         SwingUtilities.invokeLater(() -> cardLayout.show(cardPanel, GAME.name()));
         System.out.println("Wywołuję showGameWindow()");
     }
-
 }

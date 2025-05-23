@@ -12,6 +12,10 @@ public class BoardModel {
         }
     }
 
+    public void shotAt(int x, int y) {
+        shipCells[x][y].setIsHit(true);
+    }
+
     public void toggleIsShip(int x, int y) {
         shipCells[x][y].setIsShip(!shipCells[x][y].isShip());
     }

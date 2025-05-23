@@ -1,21 +1,28 @@
 package app.project.view;
 
-import app.project.controller.GameProcessor;
+import app.project.controller.GameController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Consumer;
 
-import static app.project.model.BoardType.OPPONENT_BOARD;
+import static app.project.model.BoardType.FOE_BOARD;
 import static app.project.model.BoardType.PLAYER_BOARD;
 
 public class GameView extends JPanel {
 
-    public GameView(GameProcessor gameProcessor) {
+    private Board myBoard;
+    private Board foeBoard;
+
+
+    public GameView(GameController gameController) {
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 
-        Board myBoard = new Board(PLAYER_BOARD, gameProcessor.getBoardSize(), gameProcessor.isShipFunction(), gameProcessor.toggleShipFunction());
-        Board opponentBoard = new Board(OPPONENT_BOARD, gameProcessor.getBoardSize(), gameProcessor.isShipFunction(), gameProcessor.toggleShipFunction());
+        myBoard = new Board(PLAYER_BOARD, gameController.getBoardSize(), gameController.isShipFunction(), gameController.markShotFunction());
+        foeBoard = new Board(FOE_BOARD, gameController.getBoardSize(), gameController.isShipFunction(), gameController.markShotFunction());
+        gameController.setMyBoardShotFunction(myBoard.markShotFunction());
+        gameController.setFoeBoardShotFunction(foeBoard.markShotFunction());
 
         JPanel labelsPanel = new JPanel(new GridLayout(1, 2));
         labelsPanel.add(new JLabel("Twoja plansza"));
@@ -24,7 +31,15 @@ public class GameView extends JPanel {
 
         JPanel boardsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
         boardsPanel.add(myBoard);
-        boardsPanel.add(opponentBoard);
+        boardsPanel.add(foeBoard);
         add(boardsPanel, BorderLayout.CENTER);
+    }
+
+    public Consumer<Point> myBoardShotFunction() {
+        return myBoard.markShotFunction();
+    }
+
+    public Consumer<Point> foeBoardShotFunction() {
+        return myBoard.markShotFunction();
     }
 }

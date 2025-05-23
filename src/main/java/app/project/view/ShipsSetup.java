@@ -1,7 +1,7 @@
 package app.project.view;
 
-import app.project.SocketNetworkHandler;
-import app.project.controller.GameProcessor;
+import app.project.controller.networking.SocketNetworkHandler;
+import app.project.controller.GameController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +10,7 @@ import static app.project.model.BoardType.SETUP_BOARD;
 
 public class ShipsSetup extends JPanel {
 
-    public ShipsSetup(SocketNetworkHandler networkHandler, GameProcessor gameProcessor, Runnable showGameWindowFunction) {
+    public ShipsSetup(SocketNetworkHandler networkHandler, GameController gameController) {
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 
@@ -26,7 +26,7 @@ public class ShipsSetup extends JPanel {
         topPanel.add(networkMsgLabel);
         add(topPanel, BorderLayout.NORTH);
 
-        Board board = new Board(SETUP_BOARD, gameProcessor.getBoardSize(), gameProcessor.isShipFunction(), gameProcessor.toggleShipFunction());
+        Board board = new Board(SETUP_BOARD, gameController.getBoardSize(), gameController.isShipFunction(), gameController.toggleShipFunction());
         JPanel boardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         boardPanel.add(board);
         add(boardPanel, BorderLayout.CENTER);
