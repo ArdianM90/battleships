@@ -1,8 +1,8 @@
 package app.project.view;
 
-import app.project.ClientHandler;
-import app.project.ServerHandler;
-import app.project.SocketNetworkHandler;
+import app.project.controller.networking.ClientHandler;
+import app.project.controller.networking.ServerHandler;
+import app.project.controller.networking.SocketNetworkHandler;
 
 import javax.swing.*;
 import java.awt.*;
