@@ -7,5 +7,7 @@ public interface SocketNetworkHandler {
 
     void notifySetupReadiness();
 
+    void sendShot(Point point);
+
     void setReceiveShotFunction(BiConsumer<Point, Boolean> receiveShotFunction);
 }

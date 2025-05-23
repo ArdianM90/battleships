@@ -47,6 +47,12 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
     }
 
     @Override
+    public void sendShot(Point point) {
+        outputStream.println("SHOT:" + point.x + "," + point.y);
+        isServerTurn = false;
+    }
+
+    @Override
     public void setReceiveShotFunction(BiConsumer<Point, Boolean> receiveShotFunction) {
         this.receiveShotFunction = receiveShotFunction;
     }
@@ -74,6 +80,7 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
                             int y = Integer.parseInt(parts[1]);
                             System.out.println("Klient strzela na [" + x + ", " + y +"]");
                             receiveShotFunction.accept(new Point(x, y), true);
+                            isServerTurn = true;
                         }
                     }
                 }
