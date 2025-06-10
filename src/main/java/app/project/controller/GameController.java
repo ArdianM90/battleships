@@ -2,39 +2,42 @@ package app.project.controller;
 
 import app.project.controller.local.GameEngine;
 import app.project.controller.networking.SocketNetworkHandler;
+import app.project.model.BoardType;
 
 import java.awt.*;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
+import java.util.function.*;
 
 public class GameController {
 
-    private GameEngine localGameEngine;
+    private GameEngine localEngine;
     private SocketNetworkHandler networkHandler;
+    private Consumer<Point> markShipFunction;
+    private BiConsumer<Boolean, Point> markShotFunction;
 
     public GameController(int boardSize) {
-        localGameEngine = new GameEngine(boardSize);
+        localEngine = new GameEngine(boardSize);
     }
 
-    public BiPredicate<Point, Boolean> isShipFunction() {
-        return localGameEngine.isShipFunction();
+    public BiPredicate<Point, BoardType> isShipFunction() {
+        return localEngine.isShipFunction();
     }
 
-    public BiConsumer<Point, Boolean> toggleShipFunction() {
-        return localGameEngine.toggleShipFunction();
+    private void boardClickFunction(BoardType boardType, Point point) {
+        switch (boardType) {
+            case SETUP_BOARD:
+                markShipFunction.accept(point);
+                break;
+            case PLAYER_BOARD:
+            case FOE_BOARD:
+                markShotFunction.accept(boardType.equals(BoardType.FOE_BOARD), point);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown board type: " + boardType);
+        }
     }
 
-    public void setMyBoardShotFunction(Consumer<Point> pointConsumer) {
-        localGameEngine.setMyBoardShotFunction(pointConsumer);
-    }
-
-    public void setFoeBoardShotFunction(Consumer<Point> pointConsumer) {
-        localGameEngine.setFoeBoardShotFunction(pointConsumer);
-    }
-
-    public BiConsumer<Point, Boolean> markShotFunction() {
-        return localGameEngine.markShotFunction();
+    public void notifySetupReadiness() {
+        networkHandler.notifySetupReadiness();
     }
 
     public void setNetworkHandler(SocketNetworkHandler handler) {
@@ -42,10 +45,30 @@ public class GameController {
     }
 
     public int getBoardSize() {
-        return localGameEngine.getBoardSize();
+        return localEngine.getBoardSize();
     }
 
-    public void notifySetupReadiness() {
-        networkHandler.notifySetupReadiness();
+    public void setMarkShipFunction(Consumer<Point> markShipFunction) {
+        this.markShipFunction = (point) -> {
+            localEngine.setShipAt(point);
+            markShipFunction.accept(point);
+            System.out.println("Mark SHIP function");
+            networkHandler.sendMessage("SHIP [" + point.x + ", " + point.y + "]");
+        };
+    }
+
+    public void setMarkShotFunction(BiConsumer<Boolean, Point> markShotFunction) {
+        this.markShotFunction = (foeBoard, point) -> {
+            boolean success = localEngine.saveShotAt(foeBoard, point);
+            System.out.println("Mark SHOT function, success: " + success);
+            if (success) {
+                markShotFunction.accept(foeBoard, point);
+                networkHandler.sendMessage("SHOT [" + point.x + ", " + point.y + "]");
+            }
+        };
+    }
+
+    public BiConsumer<Point, BoardType> getNotifyClickFunction() {
+        return (point, boardType) -> boardClickFunction(boardType, point);
     }
 }

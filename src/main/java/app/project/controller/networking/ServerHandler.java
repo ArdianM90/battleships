@@ -14,20 +14,23 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
 
     private volatile boolean serverSetupReady = false;
     private volatile boolean clientSetupReady = false;
-    private volatile boolean isServerTurn = true;
     private boolean gameStarted = false;
+
+    private ServerSocket serverSocket;
     private BufferedReader inputStream;
     private PrintWriter outputStream;
     private BiConsumer<Point, Boolean> receiveShotFunction;
 
     public ServerHandler(int port, Runnable goToGameFunction) {
+        this.serverSocket = null;
         this.port = port;
         this.goToGameFunction = goToGameFunction;
     }
 
     @Override
     public void run() {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try {
+            serverSocket = new ServerSocket(port);
             initConnection(serverSocket);
             clientMessagesListenerThread().start();
             while (!serverSetupReady) {
@@ -40,21 +43,16 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
     }
 
     @Override
+    public void sendMessage(String msg) {
+        System.out.println("Serwer wysyła wiadomość: " + msg);
+        outputStream.println(msg);
+    }
+
+    @Override
     public void notifySetupReadiness() {
         System.out.println("Wysyłam READY");
         serverSetupReady = true;
         startGameIfBothReady();
-    }
-
-    @Override
-    public void sendShot(Point point) {
-        outputStream.println("SHOT:" + point.x + "," + point.y);
-        isServerTurn = false;
-    }
-
-    @Override
-    public void setReceiveShotFunction(BiConsumer<Point, Boolean> receiveShotFunction) {
-        this.receiveShotFunction = receiveShotFunction;
     }
 
     private void initConnection(ServerSocket serverSocket) throws IOException {
@@ -73,15 +71,8 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
                         System.out.println("Klient wysłał READY");
                         clientSetupReady = true;
                         startGameIfBothReady();
-                    } else if (msg.startsWith("SHOT:")) {
-                        if (!isServerTurn) {
-                            String[] parts = msg.substring(5).split(",");
-                            int x = Integer.parseInt(parts[0]);
-                            int y = Integer.parseInt(parts[1]);
-                            System.out.println("Klient strzela na [" + x + ", " + y +"]");
-                            receiveShotFunction.accept(new Point(x, y), true);
-                            isServerTurn = true;
-                        }
+                    } else if (msg.startsWith("SHOT")) {
+                        System.out.println("SHOT message received");
                     }
                 }
             } catch (IOException e) {

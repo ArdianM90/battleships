@@ -4,7 +4,7 @@ import app.project.controller.GameController;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import static app.project.model.BoardType.FOE_BOARD;
 import static app.project.model.BoardType.PLAYER_BOARD;
@@ -16,13 +16,12 @@ public class GameView extends JPanel {
 
 
     public GameView(GameController gameController) {
+        gameController.setMarkShotFunction(markShotOnBoardFunction());
+        myBoard = new Board(PLAYER_BOARD, gameController.getBoardSize(), gameController.getNotifyClickFunction(), gameController.isShipFunction());
+        foeBoard = new Board(FOE_BOARD, gameController.getBoardSize(), gameController.getNotifyClickFunction(), gameController.isShipFunction());
+
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
-
-        myBoard = new Board(PLAYER_BOARD, gameController.getBoardSize(), gameController.isShipFunction(), gameController.markShotFunction());
-        foeBoard = new Board(FOE_BOARD, gameController.getBoardSize(), gameController.isShipFunction(), gameController.markShotFunction());
-        gameController.setMyBoardShotFunction(myBoard.markShotFunction());
-        gameController.setFoeBoardShotFunction(foeBoard.markShotFunction());
 
         JPanel labelsPanel = new JPanel(new GridLayout(1, 2));
         labelsPanel.add(new JLabel("Twoja plansza"));
@@ -35,11 +34,14 @@ public class GameView extends JPanel {
         add(boardsPanel, BorderLayout.CENTER);
     }
 
-    public Consumer<Point> myBoardShotFunction() {
-        return myBoard.markShotFunction();
-    }
-
-    public Consumer<Point> foeBoardShotFunction() {
-        return myBoard.markShotFunction();
+    public BiConsumer<Boolean, Point> markShotOnBoardFunction() {
+        return (isFoeBoard, point) -> {
+            System.out.println("Widok: mark shot");
+            if (isFoeBoard) {
+                foeBoard.markShot(point);
+            } else {
+                myBoard.markShot(point);
+            }
+        };
     }
 }

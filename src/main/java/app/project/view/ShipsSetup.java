@@ -4,12 +4,16 @@ import app.project.controller.GameController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Consumer;
 
 import static app.project.model.BoardType.SETUP_BOARD;
 
 public class ShipsSetup extends JPanel {
+    private Board board;
 
     public ShipsSetup(GameController gameController) {
+        gameController.setMarkShipFunction(markShipOnBoardFunction());
+
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 
@@ -25,7 +29,9 @@ public class ShipsSetup extends JPanel {
         topPanel.add(networkMsgLabel);
         add(topPanel, BorderLayout.NORTH);
 
-        Board board = new Board(SETUP_BOARD, gameController.getBoardSize(), gameController.isShipFunction(), gameController.toggleShipFunction());
+        this.board = new Board(SETUP_BOARD, gameController.getBoardSize(),
+                gameController.getNotifyClickFunction(),
+                gameController.isShipFunction());
         JPanel boardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         boardPanel.add(board);
         add(boardPanel, BorderLayout.CENTER);
@@ -36,5 +42,11 @@ public class ShipsSetup extends JPanel {
             gameController.notifySetupReadiness();
         });
         add(readyButton, BorderLayout.SOUTH);
+    }
+
+    public Consumer<Point> markShipOnBoardFunction() {
+        return (point) -> {
+            board.markShip(point);
+        };
     }
 }

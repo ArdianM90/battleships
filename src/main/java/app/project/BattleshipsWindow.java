@@ -36,8 +36,6 @@ public class BattleshipsWindow extends JFrame {
     }
 
     private void switchToShipsSetupWindow() {
-        System.out.println("Wywołuję showCreatorWindow()");
-
         ShipsSetup shipsSetup = new ShipsSetup(gameController);
         cardPanel.add(shipsSetup, SHIPS_SETUP.name());
         SwingUtilities.invokeLater(() -> cardLayout.show(cardPanel, SHIPS_SETUP.name()));
@@ -46,9 +44,6 @@ public class BattleshipsWindow extends JFrame {
     private void switchToGameWindow() {
         GameView gameView = new GameView(gameController);
         cardPanel.add(gameView, GAME.name());
-        gameController.setMyBoardShotFunction(gameView.myBoardShotFunction());
-        gameController.setFoeBoardShotFunction(gameView.foeBoardShotFunction());
         SwingUtilities.invokeLater(() -> cardLayout.show(cardPanel, GAME.name()));
-        System.out.println("Wywołuję showGameWindow()");
     }
 }

@@ -4,25 +4,25 @@ import app.project.model.BoardType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
+import java.util.function.*;
 
-import static app.project.model.BoardType.FOE_BOARD;
+import static app.project.model.BoardType.SETUP_BOARD;
 
 public class Board extends JPanel {
 
     private static final int BUTTON_SIZE = 35;
 
-    private final boolean isFoeBoard;
+    private final BoardType boardType;
     private final JButton[][] rectsArr;
-    private final BiPredicate<Point, Boolean> isShipFunction;
-    private final BiConsumer<Point, Boolean> toggleShipFunction;
+    private final BiConsumer<Point, BoardType> notifyClickFunction;
+    private final BiPredicate<Point, BoardType> isShipFunction;
 
-    public Board(BoardType boardType, int size, BiPredicate<Point, Boolean> isShipFunction, BiConsumer<Point, Boolean> toggleShipFunction) {
+    public Board(BoardType boardType, int size,
+                 BiConsumer<Point, BoardType> notifyClickFunction,
+                 BiPredicate<Point, BoardType> isShipFunction) {
+        this.notifyClickFunction = notifyClickFunction;
         this.isShipFunction = isShipFunction;
-        this.toggleShipFunction = toggleShipFunction;
-        this.isFoeBoard = boardType.equals(FOE_BOARD);
+        this.boardType = boardType;
 
         rectsArr = new JButton[size][size];
         setLayout(new GridLayout(size, size, 1, 1));
@@ -37,26 +37,34 @@ public class Board extends JPanel {
         }
     }
 
-    public Consumer<Point> markShotFunction() {
-        return (point) -> {
-            JButton button = rectsArr[point.x][point.y];
-            button.setText("X");
-            button.setFont(new Font("Arial", Font.BOLD, 18));
-            button.setForeground(Color.WHITE);
-        };
+    public void markShot(Point point) {
+        JButton button = rectsArr[point.x][point.y];
+        button.setText("X");
+        button.setFont(new Font("Arial", Font.BOLD, 18));
+        button.setForeground(Color.WHITE);
+    }
+
+    public void markShip(Point point) {
+        System.out.println("Mark ship function: " + point.x + ", " + point.y);
+        JButton button = rectsArr[point.x][point.y];
+        button.setBackground(isShipFunction.test(point, boardType) ? Color.RED : Color.BLUE);
     }
 
     private JButton createButton(Point point) {
+        // todo: przenieść sterowanie kolorem do kontrolera
         JButton button = new JButton();
-        button.setBackground(isShipFunction.test(point, isFoeBoard) ? Color.RED : Color.BLUE);
+        button.setBackground(isShipFunction.test(point, boardType) ? Color.RED : Color.BLUE);
         button.setOpaque(true);
         button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         button.setPreferredSize(new Dimension(BUTTON_SIZE, BUTTON_SIZE));
 
         button.addActionListener(e -> {
-            toggleShipFunction.accept(point, isFoeBoard);
-            button.setBackground(isShipFunction.test(point, isFoeBoard) ? Color.RED : Color.BLUE);
-            System.out.println("Kliknięto pole: " + point.x + ", " + point.y);
+            if (boardType.equals(SETUP_BOARD)) {
+                markShip(point);
+            } else {
+                markShot(point);
+            }
+            notifyClickFunction.accept(point, boardType);
         });
         return button;
     }

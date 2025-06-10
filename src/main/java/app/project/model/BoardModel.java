@@ -1,19 +1,20 @@
 package app.project.model;
 
 public class BoardModel {
-    private BoardCell[][] shipCells;
+    private BoardCellModel[][] shipCells;
 
     public BoardModel(int size) {
-        this.shipCells = new BoardCell[size][size];
+        this.shipCells = new BoardCellModel[size][size];
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
-                shipCells[row][col] = new BoardCell();
+                shipCells[row][col] = new BoardCellModel();
             }
         }
     }
 
-    public void shotAt(int x, int y) {
+    public boolean shotAt(int x, int y) {
         shipCells[x][y].setIsHit(true);
+        return true;
     }
 
     public void toggleIsShip(int x, int y) {

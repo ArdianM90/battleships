@@ -1,6 +1,6 @@
 package app.project.model;
 
-public class BoardCell {
+public class BoardCellModel {
     private boolean isShip;
     private boolean isHit;
 

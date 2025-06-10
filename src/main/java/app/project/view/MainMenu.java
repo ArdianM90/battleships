@@ -27,6 +27,7 @@ public class MainMenu extends JPanel {
         add(clientButton);
 
         hostButton.addActionListener(e -> {
+            // todo: przenieść logikę sieciową do kontrolera
             ServerHandler server = new ServerHandler(PORT, goToGameFunction);
             server.start();
             setNetworkHandlerFunction.accept(server);
@@ -35,6 +36,7 @@ public class MainMenu extends JPanel {
         });
 
         clientButton.addActionListener(e -> {
+            // todo: przenieść logikę sieciową do kontrolera
             ClientHandler client = new ClientHandler(HOST, PORT, goToGameFunction);
             client.start();
             setNetworkHandlerFunction.accept(client);
