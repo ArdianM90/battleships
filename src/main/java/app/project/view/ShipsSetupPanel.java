@@ -6,14 +6,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.Consumer;
 
+import static app.project.model.AppStage.SHIPS_SETUP;
 import static app.project.model.BoardType.SETUP_BOARD;
 
-public class ShipsSetup extends JPanel {
+public class ShipsSetupPanel extends JPanel {
     private Board board;
 
-    public ShipsSetup(GameController gameController) {
-        gameController.setMarkShipFunction(markShipOnBoardFunction());
+    public ShipsSetupPanel(GameController gameController) {
+        gameController.setHandleMarkShipFunction(markShipOnBoardFunction());
 
+        setName(SHIPS_SETUP.name());
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 
@@ -30,7 +32,7 @@ public class ShipsSetup extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
         this.board = new Board(SETUP_BOARD, gameController.getBoardSize(),
-                gameController.getNotifyClickFunction(),
+                gameController.getHandleBoardClickFunction(),
                 gameController.isShipFunction());
         JPanel boardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         boardPanel.add(board);

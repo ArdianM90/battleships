@@ -8,14 +8,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.Consumer;
 
-public class MainMenu extends JPanel {
+import static app.project.model.AppStage.MAIN_MENU;
+
+public class MainMenuPanel extends JPanel {
 
     private static final int PORT = 12345;
     private static final String HOST = "127.0.0.1";
 
-    public MainMenu(Consumer<SocketNetworkHandler> setNetworkHandlerFunction,
-                    Runnable goToShipsSetupFunction,
-                    Runnable goToGameFunction) {
+    public MainMenuPanel(Consumer<SocketNetworkHandler> setNetworkHandlerFunction,
+                         Runnable goToShipsSetupFunction,
+                         Runnable goToGameFunction) {
+        setName(MAIN_MENU.name());
         setLayout(new GridBagLayout());
         JButton hostButton = new JButton("Załóż serwer");
         JButton clientButton = new JButton("Dołącz do gry");

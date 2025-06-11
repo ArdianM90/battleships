@@ -6,20 +6,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.BiConsumer;
 
+import static app.project.model.AppStage.GAME;
 import static app.project.model.BoardType.FOE_BOARD;
 import static app.project.model.BoardType.PLAYER_BOARD;
 
-public class GameView extends JPanel {
+public class GameViewPanel extends JPanel {
 
-    private Board myBoard;
-    private Board foeBoard;
+    private final Board myBoard;
+    private final Board foeBoard;
 
+    public GameViewPanel(GameController gameController) {
+        gameController.setHandleMarkShotFunction(markShotOnBoardFunction());
+        myBoard = new Board(PLAYER_BOARD, gameController.getBoardSize(), gameController.getHandleBoardClickFunction(), gameController.isShipFunction());
+        foeBoard = new Board(FOE_BOARD, gameController.getBoardSize(), gameController.getHandleBoardClickFunction(), gameController.isShipFunction());
 
-    public GameView(GameController gameController) {
-        gameController.setMarkShotFunction(markShotOnBoardFunction());
-        myBoard = new Board(PLAYER_BOARD, gameController.getBoardSize(), gameController.getNotifyClickFunction(), gameController.isShipFunction());
-        foeBoard = new Board(FOE_BOARD, gameController.getBoardSize(), gameController.getNotifyClickFunction(), gameController.isShipFunction());
-
+        setName(GAME.name());
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 
@@ -36,7 +37,6 @@ public class GameView extends JPanel {
 
     public BiConsumer<Boolean, Point> markShotOnBoardFunction() {
         return (isFoeBoard, point) -> {
-            System.out.println("Widok: mark shot");
             if (isFoeBoard) {
                 foeBoard.markShot(point);
             } else {

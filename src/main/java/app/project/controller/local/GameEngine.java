@@ -63,12 +63,10 @@ public class GameEngine {
     }
 
     public void setShipAt(Point point) {
-        System.out.println("LocalGameEngine: putting ship on board");
         myShips.toggleIsShip(point.x, point.y);
     }
 
     public boolean saveShotAt(boolean foeBoard, Point point) {
-        System.out.println("LocalGameEngine: mark shot, foeBoard: " + foeBoard);
         return foeBoard ? foeShips.shotAt(point.x, point.y) : myShips.shotAt(point.x, point.y);
     }
 
