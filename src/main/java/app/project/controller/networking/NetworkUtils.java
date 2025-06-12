@@ -1,5 +1,6 @@
 package app.project.controller.networking;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -26,5 +27,14 @@ public class NetworkUtils {
                 .flatMap(row -> IntStream.range(0, row.length).mapToObj(i -> row[i]))
                 .map(b -> b ? SHIP_MARK : NO_SHIP_MARK)
                 .collect(Collectors.joining(","));
+    }
+
+    public static Point shotMsgToPoint(String msg) {
+        String[] stringPosition = msg.substring(msg.indexOf('[') + 1, msg.length() - 1).split(",");
+        return new Point(Integer.parseInt(stringPosition[0]), Integer.parseInt(stringPosition[1]));
+    }
+
+    public static String pointToShotMsg(Point point) {
+        return "SHOT[" + point.x + "," + point.y + "]";
     }
 }

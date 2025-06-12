@@ -44,25 +44,27 @@ public class BoardView extends JPanel {
         button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         button.setPreferredSize(new Dimension(BUTTON_SIZE, BUTTON_SIZE));
 
-        button.addActionListener(e -> {
-            if (SETUP_BOARD.equals(boardType)) {
-                markShip(point);
-            } else {
-                markShot(point);
-            }
-            notifyClickFunction.accept(boardType, point);
-        });
+        button.addActionListener(_ -> shipOnClick(point));
         return button;
     }
 
+    private void shipOnClick(Point point) {
+        if (SETUP_BOARD.equals(boardType)) {
+            markShip(point);
+            notifyClickFunction.accept(boardType, point);
+        } else if (BoardType.FOE_BOARD.equals(boardType)) {
+            drawShot(point);
+            notifyClickFunction.accept(boardType, point);
+        }
+    }
+
     public void markShip(Point point) {
-        System.out.println("Zaznaczam okręt na " + point.x + ", " + point.y + ". Zmieniam kolor na " + (isShipFunction.test(boardType, point) ? Color.RED : Color.BLUE));
         JButton button = rectsArr[point.x][point.y];
         Color newColor = isShipFunction.test(boardType, point) ? Color.RED : Color.BLUE;
         button.setBackground(newColor);
     }
 
-    public void markShot(Point point) {
+    public void drawShot(Point point) {
         JButton button = rectsArr[point.x][point.y];
         button.setText("X");
         button.setFont(new Font("Arial", Font.BOLD, 18));

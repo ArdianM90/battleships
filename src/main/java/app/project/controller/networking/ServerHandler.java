@@ -5,14 +5,14 @@ import java.io.*;
 import java.awt.Point;
 import java.net.Socket;
 import java.net.ServerSocket;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class ServerHandler extends Thread implements SocketNetworkHandler {
 
     private final int port;
     private final Runnable goToGameFunction;
-    private final Consumer<Boolean[][]> setOpponentShipsStateFunction;
+    private final Consumer<Boolean[][]> setOpponentShipsFunction;
+    private final Consumer<Point> receiveShotFunction;
 
     private volatile boolean serverSetupReady = false;
     private volatile boolean clientSetupReady = false;
@@ -21,13 +21,13 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
     private ServerSocket serverSocket;
     private BufferedReader inputStream;
     private PrintWriter outputStream;
-    private BiConsumer<Point, Boolean> receiveShotFunction;
 
-    public ServerHandler(int port, Consumer<Boolean[][]> saveOpponentShipsStateFunction, Runnable goToGameFunction) {
+    public ServerHandler(int port, Runnable goToGameFunction, Consumer<Boolean[][]> setOpponentShipsFunction, Consumer<Point> receiveShotFunction) {
         this.serverSocket = null;
         this.port = port;
         this.goToGameFunction = goToGameFunction;
-        this.setOpponentShipsStateFunction = saveOpponentShipsStateFunction;
+        this.setOpponentShipsFunction = setOpponentShipsFunction;
+        this.receiveShotFunction = receiveShotFunction;
     }
 
     @Override
@@ -73,13 +73,13 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
                 while ((msg = inputStream.readLine()) != null) {
                     System.out.println("Serwer otrzymał: " + msg);
                     if (msg.startsWith("READY")) {
-                        System.out.println("Serwer otrzymał READY: " + msg);
                         Boolean[][] opponentShips = NetworkUtils.readyMsgToShipsArray(msg);
-                        setOpponentShipsStateFunction.accept(opponentShips);
+                        setOpponentShipsFunction.accept(opponentShips);
                         clientSetupReady = true;
                         startGameIfBothReady();
                     } else if (msg.startsWith("SHOT")) {
-                        System.out.println("SHOT message received");
+                        Point point = NetworkUtils.shotMsgToPoint(msg);
+                        receiveShotFunction.accept(point);
                     }
                 }
             } catch (IOException e) {

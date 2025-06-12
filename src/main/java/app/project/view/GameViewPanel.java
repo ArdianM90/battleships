@@ -1,6 +1,7 @@
 package app.project.view;
 
 import app.project.controller.GameController;
+import app.project.model.BoardType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,9 +16,9 @@ public class GameViewPanel extends JPanel {
     private final BoardView foeBoardView;
 
     public GameViewPanel(GameController gameController) {
-        this.myBoardView = new BoardView(PLAYER_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.isShipFunction());
-        this.foeBoardView = new BoardView(FOE_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.isShipFunction());
-        gameController.setHandleMarkShotFunction(this::markShotOnBoard);
+        this.myBoardView = new BoardView(PLAYER_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.getIsShipFunction());
+        this.foeBoardView = new BoardView(FOE_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.getIsShipFunction());
+        gameController.setDrawShotCallback(this::drawShotOnBoard);
         initComponents();
     }
 
@@ -37,11 +38,14 @@ public class GameViewPanel extends JPanel {
         add(boardsPanel, BorderLayout.CENTER);
     }
 
-    private void markShotOnBoard(boolean foeBoard, Point point) {
-        if (foeBoard) {
-            foeBoardView.markShot(point);
-        } else {
-            myBoardView.markShot(point);
+    private void drawShotOnBoard(BoardType boardType, Point point) {
+        switch (boardType) {
+            case FOE_BOARD:
+                foeBoardView.drawShot(point);
+                break;
+            case PLAYER_BOARD:
+                myBoardView.drawShot(point);
+                break;
         }
     }
 }

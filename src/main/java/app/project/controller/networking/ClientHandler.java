@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.net.Socket;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class ClientHandler extends Thread implements SocketNetworkHandler {
@@ -12,21 +11,22 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
     private final int port;
     private final String host;
     private final Runnable goToGameFunction;
-    private final Consumer<Boolean[][]> setOpponentShipsStateFunction;
+    private final Consumer<Boolean[][]> setOpponentShipsFunction;
+    private final Consumer<Point> receiveShotFunction;
 
     private boolean gameStarted = false;
 
     private Socket socket;
     private PrintWriter outputStream;
     private BufferedReader inputStream;
-    private BiConsumer<Point, Boolean> receiveShotFunction;
 
-    public ClientHandler(String host, int port, Consumer<Boolean[][]> saveOpponentShipsStateFunction, Runnable goToGameFunction) {
+    public ClientHandler(String host, int port, Runnable goToGameFunction, Consumer<Boolean[][]> setOpponentShipsFunction, Consumer<Point> receiveShotFunction) {
         this.socket = null;
         this.host = host;
         this.port = port;
         this.goToGameFunction = goToGameFunction;
-        this.setOpponentShipsStateFunction = saveOpponentShipsStateFunction;
+        this.setOpponentShipsFunction = setOpponentShipsFunction;
+        this.receiveShotFunction = receiveShotFunction;
     }
 
     @Override
@@ -58,9 +58,10 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
                         SwingUtilities.invokeLater(goToGameFunction);
                     } else if (msg.startsWith("READY")) {
                         Boolean[][] opponentShips = NetworkUtils.readyMsgToShipsArray(msg);
-                        setOpponentShipsStateFunction.accept(opponentShips);
+                        setOpponentShipsFunction.accept(opponentShips);
                     } else if (msg.startsWith("SHOT")) {
-                        System.out.println("SHOT message received");
+                        Point point = NetworkUtils.shotMsgToPoint(msg);
+                        receiveShotFunction.accept(point);
                     }
                 }
             } catch (IOException e) {

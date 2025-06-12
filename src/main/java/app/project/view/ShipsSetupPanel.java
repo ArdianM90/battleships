@@ -13,7 +13,7 @@ public class ShipsSetupPanel extends JPanel {
     private final GameController gameController;
 
     public ShipsSetupPanel(GameController gameController) {
-        this.boardView = new BoardView(SETUP_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.isShipFunction());
+        this.boardView = new BoardView(SETUP_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.getIsShipFunction());
         this.gameController = gameController;
         this.gameController.setShipsSetupClickCallback(this::handleSetupBoardClick);
         initComponents();

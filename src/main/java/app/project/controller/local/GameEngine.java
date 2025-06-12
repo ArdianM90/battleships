@@ -34,16 +34,12 @@ public class GameEngine {
         }
     }
 
-    public boolean saveShotAt(boolean foeBoard, Point point) {
-        return foeBoard ? foeShips.shotAt(point.x, point.y) : myShips.shotAt(point.x, point.y);
+    public boolean saveShotAt(boolean onFoeBoard, Point point) {
+        return onFoeBoard ? foeShips.shotAt(point.x, point.y) : myShips.shotAt(point.x, point.y);
     }
 
-    public BiPredicate<BoardType, Point> isShipFunction() {
-        return (boardType, point) -> (
-                FOE_BOARD.equals(boardType)
-                        ? foeShips.getIsShip(point.x, point.y)
-                        : myShips.getIsShip(point.x, point.y)
-        );
+    public boolean isShip(BoardType boardType, Point point) {
+        return FOE_BOARD.equals(boardType) ? foeShips.getIsShip(point.x, point.y) : myShips.getIsShip(point.x, point.y);
     }
 
     public boolean[][] getMyBoardState() {
