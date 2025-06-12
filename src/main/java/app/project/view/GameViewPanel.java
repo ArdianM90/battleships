@@ -4,7 +4,6 @@ import app.project.controller.GameController;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.BiConsumer;
 
 import static app.project.model.AppStage.GAME;
 import static app.project.model.BoardType.FOE_BOARD;
@@ -18,7 +17,7 @@ public class GameViewPanel extends JPanel {
     public GameViewPanel(GameController gameController) {
         this.myBoardView = new BoardView(PLAYER_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.isShipFunction());
         this.foeBoardView = new BoardView(FOE_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.isShipFunction());
-        gameController.setHandleMarkShotFunction(markShotOnBoardFunction());
+        gameController.setHandleMarkShotFunction(this::markShotOnBoard);
         initComponents();
     }
 
@@ -38,13 +37,11 @@ public class GameViewPanel extends JPanel {
         add(boardsPanel, BorderLayout.CENTER);
     }
 
-    public BiConsumer<Boolean, Point> markShotOnBoardFunction() {
-        return (isFoeBoard, point) -> {
-            if (isFoeBoard) {
-                foeBoardView.markShot(point);
-            } else {
-                myBoardView.markShot(point);
-            }
-        };
+    private void markShotOnBoard(boolean foeBoard, Point point) {
+        if (foeBoard) {
+            foeBoardView.markShot(point);
+        } else {
+            myBoardView.markShot(point);
+        }
     }
 }

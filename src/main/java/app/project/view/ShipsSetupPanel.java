@@ -15,7 +15,7 @@ public class ShipsSetupPanel extends JPanel {
     public ShipsSetupPanel(GameController gameController) {
         this.boardView = new BoardView(SETUP_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.isShipFunction());
         this.gameController = gameController;
-        this.gameController.setSetupBoardClickCallback(this::handleSetupBoardClick);
+        this.gameController.setShipsSetupClickCallback(this::handleSetupBoardClick);
         initComponents();
     }
 
@@ -50,7 +50,7 @@ public class ShipsSetupPanel extends JPanel {
         });
     }
 
-    public void handleSetupBoardClick(Point point) {
+    private void handleSetupBoardClick(Point point) {
         boardView.markShip(point);
     }
 }

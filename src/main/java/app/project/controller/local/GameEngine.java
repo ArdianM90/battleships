@@ -12,86 +12,13 @@ import static app.project.model.BoardType.*;
 public class GameEngine {
 
     private final int boardSize;
-    private BoardModel myShips;
-    private BoardModel foeShips;
-
-//    private boolean[][] initialMyShipSetup = {
-//            {false, false, false, false, false, false, false, false, false, false, false, false},
-//            {false, true, true, true, true, false, false, false, false, false, true, false},
-//            {false, false, false, false, false, false, false, false, false, false, true, false},
-//            {false, true, true, false, false, false, false, false, false, false, false, false},
-//            {false, false, false, false, false, true, false, false, true, false, false, false},
-//            {false, false, false, false, false, false, false, false, false, false, false, false},
-//            {false, false, false, true, false, false, false, false, false, false, false, false},
-//            {false, false, false, false, false, false, false, false, false, false, false, false},
-//            {false, true, false, false, false, false, false, false, false, true, false, false},
-//            {false, true, false, false, false, false, true, false, false, true, false, false},
-//            {false, true, false, true, false, false, true, false, false, true, false, false},
-//            {false, false, false, false, false, false, false, false, false, false, false, false}
-//    };
-//    private boolean[][] initialFoeShipSetup = {
-//            {false, false, false, false, true,  true,  true,  true,  false, false, false, false},
-//            {false, false, false, false, false, false, false, false, false, false, false, false},
-//            {true,  false, false, false, false, false, false, true, true,  true,  false, false},
-//            {true,  false, false, false, false, false, false, false, false, false, false, false},
-//            {false, false, false, false, false, false, false, false, false, false, false, true },
-//            {false, false, false, false, false, true, false, false, true, false, false, true },
-//            {false, true,  true,  false, false, false, false, false, false, false, false, false},
-//            {false, false, false, false, false, false, false, false, false, false, false, false},
-//            {false, false, false, false, true,  false, false, false, false, false, true, false},
-//            {false, false, false, false, false, false, false, false, false, false, true, false},
-//            {false, false, false, false, false, false, false, false, false, false, true, false},
-//            {false, false, false, false, false, false, false, true,  false, false, false, false}
-//    };
-
-    private boolean[][] initialMyShipSetup = {
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false}
-    };
-
-    private boolean[][] initialFoeShipSetup = {
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false}
-    };
+    private final BoardModel myShips;
+    private final BoardModel foeShips;
 
     public GameEngine(int boardSize) {
         this.boardSize = boardSize;
         myShips = new BoardModel(boardSize);
-        for (int row = 0; row < boardSize; row++) {
-            for (int col = 0; col < boardSize; col++) {
-                if (initialMyShipSetup[row][col]) {
-                    myShips.toggleIsShip(row, col);
-                }
-            }
-        }
         foeShips = new BoardModel(boardSize);
-        for (int row = 0; row < boardSize; row++) {
-            for (int col = 0; col < boardSize; col++) {
-                if (initialFoeShipSetup[row][col]) {
-                    foeShips.toggleIsShip(row, col);
-                }
-            }
-        }
     }
 
     public void toggleMyShipAt(Point point) {

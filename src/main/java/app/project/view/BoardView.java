@@ -56,6 +56,7 @@ public class BoardView extends JPanel {
     }
 
     public void markShip(Point point) {
+        System.out.println("Zaznaczam okręt na " + point.x + ", " + point.y + ". Zmieniam kolor na " + (isShipFunction.test(boardType, point) ? Color.RED : Color.BLUE));
         JButton button = rectsArr[point.x][point.y];
         Color newColor = isShipFunction.test(boardType, point) ? Color.RED : Color.BLUE;
         button.setBackground(newColor);

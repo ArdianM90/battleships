@@ -1,7 +1,9 @@
 package app.project.controller;
 
 import app.project.controller.local.GameEngine;
+import app.project.controller.networking.ClientHandler;
 import app.project.controller.networking.NetworkUtils;
+import app.project.controller.networking.ServerHandler;
 import app.project.controller.networking.SocketNetworkHandler;
 import app.project.model.BoardType;
 
@@ -14,11 +16,21 @@ public class GameController {
 
     private final GameEngine localEngine;
     private SocketNetworkHandler networkHandler;
-    private Consumer<Point> setupBoardOnClickCallback;
+    private Consumer<Point> shipsSetupClickCallback;
     private BiConsumer<Boolean, Point> handleMarkShotFunction;
 
     public GameController(int boardSize) {
         localEngine = new GameEngine(boardSize);
+    }
+
+    public void loadInitialShipsPositions(boolean[][] shipsSetup) {
+        for (int row = 0; row < getBoardSize(); row++) {
+            for (int col = 0; col < getBoardSize(); col++) {
+                if (shipsSetup[row][col]) {
+                    handleShipSetup(new Point(row, col));
+                }
+            }
+        }
     }
 
     public void handleBoardClick(BoardType boardType, Point point) {
@@ -42,11 +54,11 @@ public class GameController {
 
     public void handleShipSetup(Point point) {
         localEngine.toggleMyShipAt(point);
-        setupBoardOnClickCallback.accept(point);
+        shipsSetupClickCallback.accept(point);
     }
 
-    public void setSetupBoardClickCallback(Consumer<Point> setupBoardClickCallback) {
-        this.setupBoardOnClickCallback = setupBoardClickCallback;
+    public void setShipsSetupClickCallback(Consumer<Point> shipsSetupClickCallback) {
+        this.shipsSetupClickCallback = shipsSetupClickCallback;
     }
 
     public void setHandleMarkShotFunction(BiConsumer<Boolean, Point> markShotFunction) {
@@ -69,6 +81,15 @@ public class GameController {
 
     public BiPredicate<BoardType, Point> isShipFunction() {
         return localEngine.isShipFunction();
+    }
+
+    public Boolean isServer() {
+        if (networkHandler instanceof ServerHandler) {
+            return true;
+        } else if (networkHandler instanceof ClientHandler) {
+            return false;
+        }
+        return null;
     }
 
     public int getBoardSize() {
