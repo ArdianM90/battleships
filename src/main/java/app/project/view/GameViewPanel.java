@@ -12,14 +12,17 @@ import static app.project.model.BoardType.PLAYER_BOARD;
 
 public class GameViewPanel extends JPanel {
 
-    private final Board myBoard;
-    private final Board foeBoard;
+    private final BoardView myBoardView;
+    private final BoardView foeBoardView;
 
     public GameViewPanel(GameController gameController) {
+        this.myBoardView = new BoardView(PLAYER_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.isShipFunction());
+        this.foeBoardView = new BoardView(FOE_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.isShipFunction());
         gameController.setHandleMarkShotFunction(markShotOnBoardFunction());
-        myBoard = new Board(PLAYER_BOARD, gameController.getBoardSize(), gameController.getHandleBoardClickFunction(), gameController.isShipFunction());
-        foeBoard = new Board(FOE_BOARD, gameController.getBoardSize(), gameController.getHandleBoardClickFunction(), gameController.isShipFunction());
+        initComponents();
+    }
 
+    private void initComponents() {
         setName(GAME.name());
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
@@ -30,17 +33,17 @@ public class GameViewPanel extends JPanel {
         add(labelsPanel, BorderLayout.NORTH);
 
         JPanel boardsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
-        boardsPanel.add(myBoard);
-        boardsPanel.add(foeBoard);
+        boardsPanel.add(myBoardView);
+        boardsPanel.add(foeBoardView);
         add(boardsPanel, BorderLayout.CENTER);
     }
 
     public BiConsumer<Boolean, Point> markShotOnBoardFunction() {
         return (isFoeBoard, point) -> {
             if (isFoeBoard) {
-                foeBoard.markShot(point);
+                foeBoardView.markShot(point);
             } else {
-                myBoard.markShot(point);
+                myBoardView.markShot(point);
             }
         };
     }

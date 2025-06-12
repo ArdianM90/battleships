@@ -6,11 +6,13 @@ import java.awt.Point;
 import java.net.Socket;
 import java.net.ServerSocket;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class ServerHandler extends Thread implements SocketNetworkHandler {
 
     private final int port;
     private final Runnable goToGameFunction;
+    private final Consumer<Boolean[][]> setOpponentShipsStateFunction;
 
     private volatile boolean serverSetupReady = false;
     private volatile boolean clientSetupReady = false;
@@ -21,10 +23,11 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
     private PrintWriter outputStream;
     private BiConsumer<Point, Boolean> receiveShotFunction;
 
-    public ServerHandler(int port, Runnable goToGameFunction) {
+    public ServerHandler(int port, Consumer<Boolean[][]> saveOpponentShipsStateFunction, Runnable goToGameFunction) {
         this.serverSocket = null;
         this.port = port;
         this.goToGameFunction = goToGameFunction;
+        this.setOpponentShipsStateFunction = saveOpponentShipsStateFunction;
     }
 
     @Override
@@ -49,9 +52,10 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
     }
 
     @Override
-    public void notifySetupReadiness() {
-        System.out.println("Wysyłam READY");
+    public void notifySetupReadiness(String shipsStateMsg) {
+        System.out.println("Jestem READY i wysyłam moje statki");
         serverSetupReady = true;
+        sendMessage("READY["+shipsStateMsg+"]");
         startGameIfBothReady();
     }
 
@@ -67,8 +71,11 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
             try {
                 String msg;
                 while ((msg = inputStream.readLine()) != null) {
-                    if (msg.equals("READY")) {
-                        System.out.println("Klient wysłał READY");
+                    System.out.println("Serwer otrzymał: " + msg);
+                    if (msg.startsWith("READY")) {
+                        System.out.println("Serwer otrzymał READY: " + msg);
+                        Boolean[][] opponentShips = NetworkUtils.readyMsgToShipsArray(msg);
+                        setOpponentShipsStateFunction.accept(opponentShips);
                         clientSetupReady = true;
                         startGameIfBothReady();
                     } else if (msg.startsWith("SHOT")) {

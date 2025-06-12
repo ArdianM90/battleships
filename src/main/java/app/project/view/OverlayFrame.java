@@ -27,15 +27,11 @@ public class OverlayFrame extends JFrame {
         cardPanel.add(panel, panel.getName());
     }
 
-    public Runnable switchToShipsSetupPanelFunction() {
-        return () -> {
-            SwingUtilities.invokeLater(() -> layout.show(cardPanel, SHIPS_SETUP.name()));
-        };
+    public void switchToShipsSetupPanel() {
+        SwingUtilities.invokeLater(() -> layout.show(cardPanel, SHIPS_SETUP.name()));
     }
 
-    public Runnable switchToGamePanelFunction() {
-        return () -> {
-            SwingUtilities.invokeLater(() -> layout.show(cardPanel, GAME.name()));
-        };
+    public void switchToGamePanel() {
+        SwingUtilities.invokeLater(() -> layout.show(cardPanel, GAME.name()));
     }
 }

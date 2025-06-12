@@ -4,17 +4,22 @@ import app.project.controller.GameController;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.Consumer;
 
 import static app.project.model.AppStage.SHIPS_SETUP;
 import static app.project.model.BoardType.SETUP_BOARD;
 
 public class ShipsSetupPanel extends JPanel {
-    private Board board;
+    private final BoardView boardView;
+    private final GameController gameController;
 
     public ShipsSetupPanel(GameController gameController) {
-        gameController.setHandleMarkShipFunction(markShipOnBoardFunction());
+        this.boardView = new BoardView(SETUP_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.isShipFunction());
+        this.gameController = gameController;
+        this.gameController.setSetupBoardClickCallback(this::handleSetupBoardClick);
+        initComponents();
+    }
 
+    private void initComponents() {
         setName(SHIPS_SETUP.name());
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
@@ -31,24 +36,21 @@ public class ShipsSetupPanel extends JPanel {
         topPanel.add(networkMsgLabel);
         add(topPanel, BorderLayout.NORTH);
 
-        this.board = new Board(SETUP_BOARD, gameController.getBoardSize(),
-                gameController.getHandleBoardClickFunction(),
-                gameController.isShipFunction());
         JPanel boardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        boardPanel.add(board);
+        boardPanel.add(boardView);
         add(boardPanel, BorderLayout.CENTER);
 
         JButton readyButton = new JButton("Gotowe");
         readyButton.setPreferredSize(new Dimension(800, 40));
-        readyButton.addActionListener(e -> {
-            gameController.notifySetupReadiness();
-        });
         add(readyButton, BorderLayout.SOUTH);
+
+        readyButton.addActionListener(_ -> {
+            gameController.notifySetupReadiness();
+            readyButton.setEnabled(false);
+        });
     }
 
-    public Consumer<Point> markShipOnBoardFunction() {
-        return (point) -> {
-            board.markShip(point);
-        };
+    public void handleSetupBoardClick(Point point) {
+        boardView.markShip(point);
     }
 }

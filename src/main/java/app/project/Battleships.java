@@ -14,23 +14,28 @@ public class Battleships extends JFrame {
 
     private final GameController gameController;
     private final OverlayFrame overlayFrame;
-
-    private final Runnable goToSetupFunction;
-    private final Runnable goToGameFunction;
+    private final MainMenuPanel mainMenu;
+    private final ShipsSetupPanel shipsSetup;
+    private GameViewPanel gameView;
 
     public Battleships() {
-        this.gameController = new GameController(BOARD_SIZE);
-        this.overlayFrame = new OverlayFrame();
-        this.goToSetupFunction = overlayFrame.switchToShipsSetupPanelFunction();
-        this.goToGameFunction = overlayFrame.switchToGamePanelFunction();
-
-        MainMenuPanel mainMenu = new MainMenuPanel(gameController::setNetworkHandler, this.goToSetupFunction, this.goToGameFunction);
-        ShipsSetupPanel shipsSetup = new ShipsSetupPanel(gameController);
-        GameViewPanel gameView = new GameViewPanel(gameController);
+        gameController = new GameController(BOARD_SIZE);
+        overlayFrame = new OverlayFrame();
+        mainMenu = new MainMenuPanel(gameController, overlayFrame::switchToShipsSetupPanel, this::goToGameWindow);
+        shipsSetup = new ShipsSetupPanel(gameController);
 
         overlayFrame.addPanel(mainMenu);
         overlayFrame.addPanel(shipsSetup);
-        overlayFrame.addPanel(gameView);
         overlayFrame.setVisible(true);
+    }
+
+    private void goToGameWindow() {
+        addGameView();
+        overlayFrame.switchToGamePanel();
+    }
+
+    private void addGameView() {
+        gameView = new GameViewPanel(gameController);
+        overlayFrame.addPanel(gameView);
     }
 }

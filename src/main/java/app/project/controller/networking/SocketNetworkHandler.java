@@ -4,5 +4,5 @@ public interface SocketNetworkHandler {
 
     void sendMessage(String msg);
 
-    void notifySetupReadiness();
+    void notifySetupReadiness(String shipsStateMsg);
 }

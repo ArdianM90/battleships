@@ -1,35 +1,34 @@
 package app.project.controller;
 
 import app.project.controller.local.GameEngine;
+import app.project.controller.networking.NetworkUtils;
 import app.project.controller.networking.SocketNetworkHandler;
 import app.project.model.BoardType;
 
 import java.awt.*;
 import java.util.function.*;
 
+import static app.project.model.BoardType.FOE_BOARD;
+
 public class GameController {
 
     private final GameEngine localEngine;
     private SocketNetworkHandler networkHandler;
-    private Consumer<Point> handleMarkShipFunction;
+    private Consumer<Point> setupBoardOnClickCallback;
     private BiConsumer<Boolean, Point> handleMarkShotFunction;
 
     public GameController(int boardSize) {
         localEngine = new GameEngine(boardSize);
     }
 
-    public BiPredicate<Point, BoardType> isShipFunction() {
-        return localEngine.isShipFunction();
-    }
-
-    private void handleBoardClickFunction(BoardType boardType, Point point) {
+    public void handleBoardClick(BoardType boardType, Point point) {
         switch (boardType) {
             case SETUP_BOARD:
-                handleMarkShipFunction.accept(point);
+                handleShipSetup(point);
                 break;
             case PLAYER_BOARD:
             case FOE_BOARD:
-                handleMarkShotFunction.accept(boardType.equals(BoardType.FOE_BOARD), point);
+                handleMarkShotFunction.accept(FOE_BOARD.equals(boardType), point);
                 break;
             default:
                 throw new IllegalArgumentException("Nieobsługiwany boardType: " + boardType);
@@ -37,23 +36,17 @@ public class GameController {
     }
 
     public void notifySetupReadiness() {
-        networkHandler.notifySetupReadiness();
+        String shipsStateString = NetworkUtils.shipsArrayToString(localEngine.getMyBoardState());
+        networkHandler.notifySetupReadiness(shipsStateString);
     }
 
-    public void setNetworkHandler(SocketNetworkHandler handler) {
-        this.networkHandler = handler;
+    public void handleShipSetup(Point point) {
+        localEngine.toggleMyShipAt(point);
+        setupBoardOnClickCallback.accept(point);
     }
 
-    public int getBoardSize() {
-        return localEngine.getBoardSize();
-    }
-
-    public void setHandleMarkShipFunction(Consumer<Point> markShipFunction) {
-        this.handleMarkShipFunction = (point) -> {
-            localEngine.setShipAt(point);
-            markShipFunction.accept(point);
-            networkHandler.sendMessage("SHIP[" + point.x + "," + point.y + "]");
-        };
+    public void setSetupBoardClickCallback(Consumer<Point> setupBoardClickCallback) {
+        this.setupBoardOnClickCallback = setupBoardClickCallback;
     }
 
     public void setHandleMarkShotFunction(BiConsumer<Boolean, Point> markShotFunction) {
@@ -66,7 +59,19 @@ public class GameController {
         };
     }
 
-    public BiConsumer<Point, BoardType> getHandleBoardClickFunction() {
-        return (point, boardType) -> handleBoardClickFunction(boardType, point);
+    public void setNetworkHandler(SocketNetworkHandler handler) {
+        this.networkHandler = handler;
+    }
+
+    public void setOpponentShipsState(Boolean[][] shipsState) {
+        localEngine.saveOpponentShips(shipsState);
+    }
+
+    public BiPredicate<BoardType, Point> isShipFunction() {
+        return localEngine.isShipFunction();
+    }
+
+    public int getBoardSize() {
+        return localEngine.getBoardSize();
     }
 }
