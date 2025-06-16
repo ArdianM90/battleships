@@ -1,18 +1,25 @@
-package app.project.controller;
+package app.project;
 
-import app.project.model.BoardModel;
+import app.project.controller.GameController;
+import app.project.view.GameViewPanel;
+import app.project.view.MainMenuPanel;
+import app.project.view.OverlayFrame;
+import app.project.view.ShipsSetupPanel;
 
-import java.awt.*;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
+import javax.swing.*;
 
-public class GameProcessor {
+public class Battleships extends JFrame {
 
-    private final int boardSize;
-    private BoardModel myShips;
-    private BoardModel opponentShips;
+    private static final int BOARD_SIZE = 12;
+    private static final int SHIPS_QTY = 20;
 
-    private boolean[][] tmpShipSetup = {
+    private final GameController gameController;
+    private final OverlayFrame overlayFrame;
+    private final MainMenuPanel mainMenu;
+    private ShipsSetupPanel shipsSetup;
+    private GameViewPanel gameView;
+
+    private boolean[][] initialServerShipSetup = {
             {false, false, false, false, false, false, false, false, false, false, false, false},
             {false, true, true, true, true, false, false, false, false, false, true, false},
             {false, false, false, false, false, false, false, false, false, false, true, false},
@@ -26,7 +33,8 @@ public class GameProcessor {
             {false, true, false, true, false, false, true, false, false, true, false, false},
             {false, false, false, false, false, false, false, false, false, false, false, false}
     };
-    private boolean[][] tmpOponnentShipSetup = {
+
+    private boolean[][] initialClientShipSetup = {
             {false, false, false, false, true,  true,  true,  true,  false, false, false, false},
             {false, false, false, false, false, false, false, false, false, false, false, false},
             {true,  false, false, false, false, false, false, true, true,  true,  false, false},
@@ -41,43 +49,26 @@ public class GameProcessor {
             {false, false, false, false, false, false, false, true,  false, false, false, false}
     };
 
-    public GameProcessor(int boardSize) {
-        this.boardSize = boardSize;
-        myShips = new BoardModel(boardSize);
-        for (int row = 0; row < boardSize; row++) {
-            for (int col = 0; col < boardSize; col++) {
-                if (tmpShipSetup[row][col]) {
-                    myShips.toggleIsShip(row, col);
-                }
-            }
-        }
-        opponentShips = new BoardModel(boardSize);
-        for (int row = 0; row < boardSize; row++) {
-            for (int col = 0; col < boardSize; col++) {
-                if (tmpOponnentShipSetup[row][col]) {
-                    opponentShips.toggleIsShip(row, col);
-                }
-            }
-        }
+    public Battleships() {
+        gameController = new GameController(BOARD_SIZE, SHIPS_QTY);
+        overlayFrame = new OverlayFrame();
+        mainMenu = new MainMenuPanel(gameController, this::goToShipsSetupPanel, this::goToGamePanel);
+        shipsSetup = new ShipsSetupPanel(gameController);
+
+        overlayFrame.addPanel(mainMenu);
+        overlayFrame.setVisible(true);
     }
 
-    public BiPredicate<Point, Boolean> isShipFunction() {
-        return (point, isOpponentBoard) -> isOpponentBoard
-                ? opponentShips.getIsShip(point.x, point.y)
-                : myShips.getIsShip(point.x, point.y);
+    private void goToShipsSetupPanel() {
+        shipsSetup = new ShipsSetupPanel(gameController);
+        gameController.loadInitialShipsPositions(gameController.isServer() ? initialServerShipSetup : initialClientShipSetup); // for tests only
+        overlayFrame.addPanel(shipsSetup);
+        overlayFrame.switchToShipsSetupPanel();
     }
 
-    public BiConsumer<Point, Boolean> toggleShipFunction() {
-        return (point, isOpponentBoard) -> {
-            if (isOpponentBoard) {
-                opponentShips.toggleIsShip(point.x, point.y);
-            } else {
-                myShips.toggleIsShip(point.x, point.y);
-            }
-        };
-    }
-
-    public int getBoardSize() {
-        return boardSize;
+    private void goToGamePanel() {
+        gameView = new GameViewPanel(gameController);
+        overlayFrame.addPanel(gameView);
+        overlayFrame.switchToGamePanel();
     }
 }

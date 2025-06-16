@@ -1,16 +1,26 @@
 package app.project.view;
 
-import app.project.SocketNetworkHandler;
-import app.project.controller.GameProcessor;
+import app.project.controller.GameController;
 
 import javax.swing.*;
 import java.awt.*;
 
+import static app.project.model.AppStage.SHIPS_SETUP;
 import static app.project.model.BoardType.SETUP_BOARD;
 
-public class ShipsSetup extends JPanel {
+public class ShipsSetupPanel extends JPanel {
+    private final BoardView boardView;
+    private final GameController gameController;
 
-    public ShipsSetup(SocketNetworkHandler networkHandler, GameProcessor gameProcessor, Runnable showGameWindowFunction) {
+    public ShipsSetupPanel(GameController gameController) {
+        this.boardView = new BoardView(SETUP_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.getIsShipFunction());
+        this.gameController = gameController;
+        this.gameController.setShipsSetupClickCallback(this::handleSetupBoardClick);
+        initComponents();
+    }
+
+    private void initComponents() {
+        setName(SHIPS_SETUP.name());
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 
@@ -26,16 +36,21 @@ public class ShipsSetup extends JPanel {
         topPanel.add(networkMsgLabel);
         add(topPanel, BorderLayout.NORTH);
 
-        Board board = new Board(SETUP_BOARD, gameProcessor.getBoardSize(), gameProcessor.isShipFunction(), gameProcessor.toggleShipFunction());
         JPanel boardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        boardPanel.add(board);
+        boardPanel.add(boardView);
         add(boardPanel, BorderLayout.CENTER);
 
         JButton readyButton = new JButton("Gotowe");
         readyButton.setPreferredSize(new Dimension(800, 40));
-        readyButton.addActionListener(e -> {
-            networkHandler.notifySetupReadiness();
-        });
         add(readyButton, BorderLayout.SOUTH);
+
+        readyButton.addActionListener(_ -> {
+            gameController.notifySetupReadiness();
+            readyButton.setEnabled(false);
+        });
+    }
+
+    private void handleSetupBoardClick(Point point) {
+        boardView.markShip(point);
     }
 }

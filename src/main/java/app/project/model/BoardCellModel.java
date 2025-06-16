@@ -1,11 +1,15 @@
 package app.project.model;
 
-public class BoardCell {
+public class BoardCellModel {
     private boolean isShip;
     private boolean isHit;
 
     public boolean isShip() {
         return isShip;
+    }
+
+    public void toggleIsShip() {
+        isShip = !isShip;
     }
 
     public void setIsShip(boolean ship) {
@@ -16,7 +20,7 @@ public class BoardCell {
         return isHit;
     }
 
-    public void setIsHit(boolean hit) {
-        isHit = hit;
+    public void setHit() {
+        isHit = true;
     }
 }
