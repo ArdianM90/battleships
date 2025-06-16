@@ -8,6 +8,10 @@ public class BoardCellModel {
         return isShip;
     }
 
+    public void toggleIsShip() {
+        isShip = !isShip;
+    }
+
     public void setIsShip(boolean ship) {
         isShip = ship;
     }
@@ -16,7 +20,7 @@ public class BoardCellModel {
         return isHit;
     }
 
-    public void setIsHit(boolean hit) {
-        isHit = hit;
+    public void setHit() {
+        isHit = true;
     }
 }

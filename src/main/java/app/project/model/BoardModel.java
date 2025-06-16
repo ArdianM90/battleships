@@ -14,19 +14,6 @@ public class BoardModel {
         }
     }
 
-    public boolean shotAt(int x, int y) {
-        shipCells[x][y].setIsHit(true);
-        return true;
-    }
-
-    public void setIsShip(int x, int y, boolean isShip) {
-        shipCells[x][y].setIsShip(isShip);
-    }
-
-    public boolean getIsShip(int x, int y) {
-        return shipCells[x][y].isShip();
-    }
-
     public boolean[][] getShipPositions() {
         int boardSize = shipCells.length;
         boolean[][] boardStateArr = new boolean[boardSize][boardSize];
@@ -43,6 +30,26 @@ public class BoardModel {
                 .flatMap(Arrays::stream)
                 .mapToInt(e -> (e.isShip() && e.isHit()) ? 1 : 0)
                 .sum();
+    }
+
+    public void toggleIsShip(int x, int y) {
+        shipCells[x][y].toggleIsShip();
+    }
+
+    public void setShip(int x, int y) {
+        shipCells[x][y].setIsShip(true);
+    }
+
+    public boolean getIsShip(int x, int y) {
+        return shipCells[x][y].isShip();
+    }
+
+    public boolean shotAt(int x, int y) {
+        if (shipCells[x][y].isHit()) {
+            return false;
+        }
+        shipCells[x][y].setHit();
+        return true;
     }
 
     public void print(boolean myShips) {

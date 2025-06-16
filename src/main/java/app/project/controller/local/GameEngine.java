@@ -12,25 +12,29 @@ public class GameEngine {
 
     private final int boardSize;
     private final int shipsQty;
+    private boolean myTurn;
     private final BoardModel myShips;
     private final BoardModel foeShips;
 
     public GameEngine(int boardSize, int shipsQty) {
         this.boardSize = boardSize;
         this.shipsQty = shipsQty;
-        myShips = new BoardModel(boardSize);
-        foeShips = new BoardModel(boardSize);
+        this.myTurn = false;
+        this.myShips = new BoardModel(boardSize);
+        this.foeShips = new BoardModel(boardSize);
     }
 
     public void toggleMyShipAt(Point point) {
-        myShips.setIsShip(point.x, point.y, !myShips.getIsShip(point.x, point.y));
+        myShips.toggleIsShip(point.x, point.y);
         myShips.print(true);
     }
 
     public void saveOpponentShips(Boolean[][] shipsState) {
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
-                foeShips.setIsShip(row, col, shipsState[row][col]);
+                if (shipsState[row][col]) {
+                    foeShips.setShip(row, col);
+                }
             }
         }
     }
@@ -56,9 +60,16 @@ public class GameEngine {
         return switch (boardType) {
             case FOE_BOARD -> foeShips.countHitShips();
             case PLAYER_BOARD -> myShips.countHitShips();
-            default ->
-                    throw new IllegalArgumentException("Błąd podczas liczenia zatopień - niepoprawny typ planszy: " + boardType);
+            default -> throw new IllegalArgumentException("Błąd podczas liczenia zatopień - niepoprawny typ planszy: " + boardType);
         };
+    }
+
+    public boolean isMyTurn() {
+        return myTurn;
+    }
+
+    public void setMyTurn(boolean myTurn) {
+        this.myTurn = myTurn;
     }
 
     public int getBoardSize() {

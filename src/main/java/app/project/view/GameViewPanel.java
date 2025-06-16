@@ -20,6 +20,8 @@ public class GameViewPanel extends JPanel {
     private final JLabel foeBoardLabel;
     private final int shipsPerBoardQty;
 
+    private JLabel turnLabel;
+
     public GameViewPanel(GameController gameController) {
         this.countHitsQtyFunction = gameController.getCountSunkenShipsFunction();
         this.myBoardView = new BoardView(PLAYER_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.getIsShipFunction());
@@ -28,13 +30,20 @@ public class GameViewPanel extends JPanel {
         this.foeBoardLabel = new JLabel("", SwingConstants.CENTER);
         this.shipsPerBoardQty = gameController.getShipsPerBoardQty();
         gameController.setDrawShotCallback(this::drawShotOnBoard);
-        initComponents();
+        gameController.setMyTurnNotificationCallback(this::switchTurnLabel);
+        initComponents(gameController.isServer());
     }
 
-    private void initComponents() {
+    private void initComponents(boolean isServer) {
         setName(GAME.name());
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
+        JPanel topPanel = new JPanel(new BorderLayout());
+        this.turnLabel = new JLabel(isServer ? "TWOJA TURA" : "PRZECIWNIK ZACZYNA", SwingConstants.CENTER);
+        turnLabel.setForeground(isServer ? Color.GREEN.darker() : Color.RED);
+        turnLabel.setFont(turnLabel.getFont().deriveFont(Font.BOLD, 18f));
+        topPanel.add(turnLabel, BorderLayout.CENTER);
+        add(topPanel, BorderLayout.NORTH);
 
         JPanel boardsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
         boardsPanel.add(createBoardWithLabel(myBoardLabel, myBoardView));
@@ -53,6 +62,11 @@ public class GameViewPanel extends JPanel {
         panel.add(Box.createVerticalStrut(10));
         panel.add(board);
         return panel;
+    }
+
+    public void switchTurnLabel(boolean myTurn) {
+        turnLabel.setText(myTurn ? "TWOJA TURA" : "TURA PRZECIWNIKA");
+        turnLabel.setForeground(myTurn ? Color.GREEN.darker() : Color.RED);
     }
 
     public void updateBoardLabel(BoardType boardType, int hitsQty, int shipsGty) {

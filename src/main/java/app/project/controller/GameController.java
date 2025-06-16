@@ -19,6 +19,7 @@ public class GameController {
     private SocketNetworkHandler networkHandler;
     private Consumer<Point> shipsSetupClickCallback;
     private BiConsumer<BoardType, Point> drawShotCallback;
+    private Consumer<Boolean> showMyTurnLabelCallback;
 
     public GameController(int boardSize, int shipsQty) {
         localEngine = new GameEngine(boardSize, shipsQty);
@@ -35,16 +36,17 @@ public class GameController {
     }
 
     public void notifySetupReadiness() {
-        String shipsStateString = NetworkUtils.shipsArrayToString(localEngine.getMyShipPositions());
-        networkHandler.notifySetupReadiness(shipsStateString);
+        String shipsPositionsString = NetworkUtils.shipsArrayToString(localEngine.getMyShipPositions());
+        networkHandler.notifySetupReadiness(shipsPositionsString);
     }
 
     public void handleBoardClick(BoardType boardType, Point point) {
         switch (boardType) {
             case SETUP_BOARD -> handleShipSetup(point);
             case FOE_BOARD -> {
-                handleMyShot(point);
-                drawShotCallback.accept(FOE_BOARD, point);
+                if (localEngine.isMyTurn()) {
+                    handleMyShot(point);
+                }
             }
             default -> throw new IllegalArgumentException("Niepoprawny typ planszy: " + boardType);
         }
@@ -61,16 +63,26 @@ public class GameController {
             drawShotCallback.accept(FOE_BOARD, point);
             String shotMsg = NetworkUtils.pointToShotMsg(point);
             networkHandler.sendMessage(shotMsg);
+            showMyTurnLabelCallback.accept(false);
+            localEngine.setMyTurn(false);
         }
     }
 
     public void handleOpponentShot(Point point) {
-        localEngine.saveShotAt(PLAYER_BOARD, point);
-        drawShotCallback.accept(PLAYER_BOARD, point);
+        boolean success = localEngine.saveShotAt(PLAYER_BOARD, point);
+        if (success) {
+            drawShotCallback.accept(PLAYER_BOARD, point);
+            showMyTurnLabelCallback.accept(true);
+            localEngine.setMyTurn(true);
+        }
     }
 
     public void setShipsSetupClickCallback(Consumer<Point> shipsSetupClickCallback) {
         this.shipsSetupClickCallback = shipsSetupClickCallback;
+    }
+
+    public void setMyTurnNotificationCallback(Consumer<Boolean> showMyTurnLabelCallback) {
+        this.showMyTurnLabelCallback = showMyTurnLabelCallback;
     }
 
     public void setDrawShotCallback(BiConsumer<BoardType, Point> drawShotCallback) {
@@ -95,6 +107,10 @@ public class GameController {
     }
 
     public void setNetworkHandler(SocketNetworkHandler handler) {
+        if (this.networkHandler != null) {
+            throw new IllegalStateException("NetworkHandler już istnieje.");
+        }
+        localEngine.setMyTurn(handler instanceof ServerHandler);
         this.networkHandler = handler;
     }
 

@@ -50,10 +50,8 @@ public class BoardView extends JPanel {
 
     private void shipOnClick(Point point) {
         if (SETUP_BOARD.equals(boardType)) {
-            markShip(point);
             notifyClickFunction.accept(boardType, point);
         } else if (BoardType.FOE_BOARD.equals(boardType)) {
-            drawShot(point);
             notifyClickFunction.accept(boardType, point);
         }
     }
