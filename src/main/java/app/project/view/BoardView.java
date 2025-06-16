@@ -67,7 +67,7 @@ public class BoardView extends JPanel {
     public void drawShot(Point point) {
         JButton button = rectsArr[point.x][point.y];
         button.setText("X");
-        button.setFont(new Font("Arial", Font.BOLD, 18));
+        button.setFont(new Font("Arial", Font.BOLD, 20));
         button.setForeground(Color.WHITE);
         System.out.println("is ship: " + isShipFunction.test(boardType, point));
     }

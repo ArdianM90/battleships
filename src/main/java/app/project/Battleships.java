@@ -11,6 +11,7 @@ import javax.swing.*;
 public class Battleships extends JFrame {
 
     private static final int BOARD_SIZE = 12;
+    private static final int SHIPS_QTY = 20;
 
     private final GameController gameController;
     private final OverlayFrame overlayFrame;
@@ -49,7 +50,7 @@ public class Battleships extends JFrame {
     };
 
     public Battleships() {
-        gameController = new GameController(BOARD_SIZE);
+        gameController = new GameController(BOARD_SIZE, SHIPS_QTY);
         overlayFrame = new OverlayFrame();
         mainMenu = new MainMenuPanel(gameController, this::goToShipsSetupPanel, this::goToGamePanel);
         shipsSetup = new ShipsSetupPanel(gameController);

@@ -4,7 +4,6 @@ import app.project.model.BoardModel;
 import app.project.model.BoardType;
 
 import java.awt.*;
-import java.util.function.BiPredicate;
 
 import static app.project.model.BoardType.*;
 
@@ -12,17 +11,19 @@ import static app.project.model.BoardType.*;
 public class GameEngine {
 
     private final int boardSize;
+    private final int shipsQty;
     private final BoardModel myShips;
     private final BoardModel foeShips;
 
-    public GameEngine(int boardSize) {
+    public GameEngine(int boardSize, int shipsQty) {
         this.boardSize = boardSize;
+        this.shipsQty = shipsQty;
         myShips = new BoardModel(boardSize);
         foeShips = new BoardModel(boardSize);
     }
 
     public void toggleMyShipAt(Point point) {
-        myShips.toggleIsShip(point.x, point.y);
+        myShips.setIsShip(point.x, point.y, !myShips.getIsShip(point.x, point.y));
         myShips.print(true);
     }
 
@@ -34,19 +35,37 @@ public class GameEngine {
         }
     }
 
-    public boolean saveShotAt(boolean onFoeBoard, Point point) {
-        return onFoeBoard ? foeShips.shotAt(point.x, point.y) : myShips.shotAt(point.x, point.y);
+    public boolean saveShotAt(BoardType boardType, Point point) {
+        return switch (boardType) {
+            case FOE_BOARD -> foeShips.shotAt(point.x, point.y);
+            case PLAYER_BOARD -> myShips.shotAt(point.x, point.y);
+            default ->
+                    throw new IllegalArgumentException("Błąd podczas obsługiwania strzału - niepoprawny typ planszy: " + boardType);
+        };
     }
 
     public boolean isShip(BoardType boardType, Point point) {
         return FOE_BOARD.equals(boardType) ? foeShips.getIsShip(point.x, point.y) : myShips.getIsShip(point.x, point.y);
     }
 
-    public boolean[][] getMyBoardState() {
-        return myShips.getBoardStateArray();
+    public boolean[][] getMyShipPositions() {
+        return myShips.getShipPositions();
+    }
+
+    public int countSunkenShips(BoardType boardType) {
+        return switch (boardType) {
+            case FOE_BOARD -> foeShips.countHitShips();
+            case PLAYER_BOARD -> myShips.countHitShips();
+            default ->
+                    throw new IllegalArgumentException("Błąd podczas liczenia zatopień - niepoprawny typ planszy: " + boardType);
+        };
     }
 
     public int getBoardSize() {
         return boardSize;
+    }
+
+    public int getShipsQty() {
+        return shipsQty;
     }
 }

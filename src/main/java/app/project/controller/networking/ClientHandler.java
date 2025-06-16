@@ -14,8 +14,6 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
     private final Consumer<Boolean[][]> setOpponentShipsFunction;
     private final Consumer<Point> receiveShotFunction;
 
-    private boolean gameStarted = false;
-
     private Socket socket;
     private PrintWriter outputStream;
     private BufferedReader inputStream;
@@ -54,7 +52,6 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
                 while ((msg = inputStream.readLine()) != null) {
                     System.out.println("Klient otrzymał: " + msg);
                     if (msg.equals("START")) {
-                        gameStarted = true;
                         SwingUtilities.invokeLater(goToGameFunction);
                     } else if (msg.startsWith("READY")) {
                         Boolean[][] opponentShips = NetworkUtils.readyMsgToShipsArray(msg);

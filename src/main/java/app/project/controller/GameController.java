@@ -20,8 +20,8 @@ public class GameController {
     private Consumer<Point> shipsSetupClickCallback;
     private BiConsumer<BoardType, Point> drawShotCallback;
 
-    public GameController(int boardSize) {
-        localEngine = new GameEngine(boardSize);
+    public GameController(int boardSize, int shipsQty) {
+        localEngine = new GameEngine(boardSize, shipsQty);
     }
 
     public void loadInitialShipsPositions(boolean[][] shipsSetup) {
@@ -35,19 +35,18 @@ public class GameController {
     }
 
     public void notifySetupReadiness() {
-        String shipsStateString = NetworkUtils.shipsArrayToString(localEngine.getMyBoardState());
+        String shipsStateString = NetworkUtils.shipsArrayToString(localEngine.getMyShipPositions());
         networkHandler.notifySetupReadiness(shipsStateString);
     }
 
     public void handleBoardClick(BoardType boardType, Point point) {
         switch (boardType) {
-            case SETUP_BOARD:
-                handleShipSetup(point);
-                break;
-            case FOE_BOARD:
+            case SETUP_BOARD -> handleShipSetup(point);
+            case FOE_BOARD -> {
                 handleMyShot(point);
                 drawShotCallback.accept(FOE_BOARD, point);
-                break;
+            }
+            default -> throw new IllegalArgumentException("Niepoprawny typ planszy: " + boardType);
         }
     }
 
@@ -57,7 +56,7 @@ public class GameController {
     }
 
     private void handleMyShot(Point point) {
-        boolean success = localEngine.saveShotAt(true, point);
+        boolean success = localEngine.saveShotAt(FOE_BOARD, point);
         if (success) {
             drawShotCallback.accept(FOE_BOARD, point);
             String shotMsg = NetworkUtils.pointToShotMsg(point);
@@ -66,7 +65,7 @@ public class GameController {
     }
 
     public void handleOpponentShot(Point point) {
-        localEngine.saveShotAt(false, point);
+        localEngine.saveShotAt(PLAYER_BOARD, point);
         drawShotCallback.accept(PLAYER_BOARD, point);
     }
 
@@ -80,6 +79,10 @@ public class GameController {
 
     public BiPredicate<BoardType, Point> getIsShipFunction() {
         return localEngine::isShip;
+    }
+
+    public Function<BoardType, Integer> getCountSunkenShipsFunction() {
+        return localEngine::countSunkenShips;
     }
 
     public Boolean isServer() {
@@ -101,5 +104,9 @@ public class GameController {
 
     public int getBoardSize() {
         return localEngine.getBoardSize();
+    }
+
+    public int getShipsPerBoardQty() {
+        return localEngine.getShipsQty();
     }
 }

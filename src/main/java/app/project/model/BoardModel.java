@@ -1,5 +1,7 @@
 package app.project.model;
 
+import java.util.Arrays;
+
 public class BoardModel {
     private BoardCellModel[][] shipCells;
 
@@ -17,16 +19,30 @@ public class BoardModel {
         return true;
     }
 
-    public void toggleIsShip(int x, int y) {
-        shipCells[x][y].setIsShip(!shipCells[x][y].isShip());
-    }
-
     public void setIsShip(int x, int y, boolean isShip) {
         shipCells[x][y].setIsShip(isShip);
     }
 
     public boolean getIsShip(int x, int y) {
         return shipCells[x][y].isShip();
+    }
+
+    public boolean[][] getShipPositions() {
+        int boardSize = shipCells.length;
+        boolean[][] boardStateArr = new boolean[boardSize][boardSize];
+        for (int row = 0; row < boardSize; row++) {
+            for (int col = 0; col < boardSize; col++) {
+                boardStateArr[row][col] = shipCells[row][col].isShip();
+            }
+        }
+        return boardStateArr;
+    }
+
+    public int countHitShips() {
+        return Arrays.stream(shipCells)
+                .flatMap(Arrays::stream)
+                .mapToInt(e -> (e.isShip() && e.isHit()) ? 1 : 0)
+                .sum();
     }
 
     public void print(boolean myShips) {
@@ -37,16 +53,5 @@ public class BoardModel {
             }
             System.out.println();
         }
-    }
-
-    public boolean[][] getBoardStateArray() {
-        int boardSize = shipCells.length;
-        boolean[][] boardStateArr = new boolean[boardSize][boardSize];
-        for (int row = 0; row < boardSize; row++) {
-            for (int col = 0; col < boardSize; col++) {
-                boardStateArr[row][col] = shipCells[row][col].isShip();
-            }
-        }
-        return boardStateArr;
     }
 }
