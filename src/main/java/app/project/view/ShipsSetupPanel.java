@@ -51,6 +51,6 @@ public class ShipsSetupPanel extends JPanel {
     }
 
     private void handleSetupBoardClick(Point point) {
-        boardView.markShip(point);
+        boardView.toggleShip(point);
     }
 }
