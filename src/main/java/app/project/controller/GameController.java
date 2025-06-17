@@ -81,7 +81,7 @@ public class GameController {
         this.shipsSetupClickCallback = shipsSetupClickCallback;
     }
 
-    public void setMyTurnNotificationCallback(Consumer<Boolean> showMyTurnLabelCallback) {
+    public void setMyTurnLabelCallback(Consumer<Boolean> showMyTurnLabelCallback) {
         this.showMyTurnLabelCallback = showMyTurnLabelCallback;
     }
 

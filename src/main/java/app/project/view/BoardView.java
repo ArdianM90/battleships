@@ -67,6 +67,5 @@ public class BoardView extends JPanel {
         button.setText("X");
         button.setFont(new Font("Arial", Font.BOLD, 20));
         button.setForeground(Color.WHITE);
-        System.out.println("is ship: " + isShipFunction.test(boardType, point));
     }
 }

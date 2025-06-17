@@ -30,7 +30,7 @@ public class GameViewPanel extends JPanel {
         this.foeBoardLabel = new JLabel("", SwingConstants.CENTER);
         this.shipsPerBoardQty = gameController.getShipsPerBoardQty();
         gameController.setDrawShotCallback(this::drawShotOnBoard);
-        gameController.setMyTurnNotificationCallback(this::switchTurnLabel);
+        gameController.setMyTurnLabelCallback(this::switchTurnLabel);
         initComponents(gameController.isServer());
     }
 
