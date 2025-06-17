@@ -3,10 +3,11 @@ package app.project.view;
 import javax.swing.*;
 import java.awt.*;
 
-import static app.project.model.AppStage.GAME;
-import static app.project.model.AppStage.SHIPS_SETUP;
+import static app.project.model.AppStage.*;
 
 public class OverlayFrame extends JFrame {
+
+    private static final int SUMMARY_DELAY_SECONDS = 2;
 
     private final CardLayout layout;
     private final JPanel cardPanel;
@@ -33,5 +34,14 @@ public class OverlayFrame extends JFrame {
 
     public void switchToGamePanel() {
         SwingUtilities.invokeLater(() -> layout.show(cardPanel, GAME.name()));
+    }
+
+    public void switchToSummaryPanel() {
+        new Timer(SUMMARY_DELAY_SECONDS * 1000, e -> {
+            SwingUtilities.invokeLater(() -> layout.show(cardPanel, SUMMARY.name()));
+        }) {{
+            setRepeats(false);
+            start();
+        }};
     }
 }

@@ -52,7 +52,7 @@ public class MainMenuPanel extends JPanel {
 
     private void serverOnClickAction() {
         // todo: przenieść logikę sieciową do kontrolera
-        ServerHandler server = new ServerHandler(PORT, goToGameFunction, gameController::setOpponentShipsState, gameController::handleOpponentShot);
+        ServerHandler server = new ServerHandler(PORT, goToGameFunction, gameController::setOpponentShipsState, gameController::handleShot);
         server.start();
         gameController.setNetworkHandler(server);
         System.out.println("Serwer przechodzi do edycji.");
@@ -61,7 +61,7 @@ public class MainMenuPanel extends JPanel {
 
     private void clientOnClickAction() {
         // todo: przenieść logikę sieciową do kontrolera
-        ClientHandler client = new ClientHandler(HOST, PORT, goToGameFunction, gameController::setOpponentShipsState, gameController::handleOpponentShot);
+        ClientHandler client = new ClientHandler(HOST, PORT, goToGameFunction, gameController::setOpponentShipsState, gameController::handleShot);
         client.start();
         gameController.setNetworkHandler(client);
         System.out.println("Klient przechodzi do edycji.");

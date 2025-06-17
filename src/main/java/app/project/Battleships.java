@@ -1,23 +1,22 @@
 package app.project;
 
 import app.project.controller.GameController;
-import app.project.view.GameViewPanel;
-import app.project.view.MainMenuPanel;
-import app.project.view.OverlayFrame;
-import app.project.view.ShipsSetupPanel;
+import app.project.controller.local.GameStats;
+import app.project.view.*;
 
 import javax.swing.*;
 
 public class Battleships extends JFrame {
 
     private static final int BOARD_SIZE = 12;
-    private static final int SHIPS_QTY = 20;
+    private static final int SHIPS_QTY = 4;
 
     private final GameController gameController;
     private final OverlayFrame overlayFrame;
     private final MainMenuPanel mainMenu;
     private ShipsSetupPanel shipsSetup;
     private GameViewPanel gameView;
+    private SummaryPanel summaryView;
 
     private boolean[][] initialServerShipSetup = {
             {false, false, false, false, false, false, false, false, false, false, false, false},
@@ -50,7 +49,7 @@ public class Battleships extends JFrame {
     };
 
     public Battleships() {
-        gameController = new GameController(BOARD_SIZE, SHIPS_QTY);
+        gameController = new GameController(BOARD_SIZE, SHIPS_QTY, this::goToSummaryPanel);
         overlayFrame = new OverlayFrame();
         mainMenu = new MainMenuPanel(gameController, this::goToShipsSetupPanel, this::goToGamePanel);
         shipsSetup = new ShipsSetupPanel(gameController);
@@ -70,5 +69,11 @@ public class Battleships extends JFrame {
         gameView = new GameViewPanel(gameController);
         overlayFrame.addPanel(gameView);
         overlayFrame.switchToGamePanel();
+    }
+
+    private void goToSummaryPanel() {
+        summaryView = new SummaryPanel(gameController, new GameStats());
+        overlayFrame.addPanel(summaryView);
+        overlayFrame.switchToSummaryPanel();
     }
 }

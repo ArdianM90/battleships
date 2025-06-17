@@ -1,18 +1,23 @@
 package app.project.controller.networking;
 
+import app.project.model.BoardType;
+
 import javax.swing.*;
 import java.io.*;
 import java.awt.Point;
 import java.net.Socket;
 import java.net.ServerSocket;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import static app.project.model.BoardType.PLAYER_BOARD;
 
 public class ServerHandler extends Thread implements SocketNetworkHandler {
 
     private final int port;
     private final Runnable goToGameFunction;
     private final Consumer<Boolean[][]> setOpponentShipsFunction;
-    private final Consumer<Point> receiveShotFunction;
+    private final BiConsumer<BoardType, Point> receiveShotFunction;
 
     private volatile boolean serverSetupReady = false;
     private volatile boolean clientSetupReady = false;
@@ -22,7 +27,7 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
     private BufferedReader inputStream;
     private PrintWriter outputStream;
 
-    public ServerHandler(int port, Runnable goToGameFunction, Consumer<Boolean[][]> setOpponentShipsFunction, Consumer<Point> receiveShotFunction) {
+    public ServerHandler(int port, Runnable goToGameFunction, Consumer<Boolean[][]> setOpponentShipsFunction, BiConsumer<BoardType, Point> receiveShotFunction) {
         this.serverSocket = null;
         this.port = port;
         this.goToGameFunction = goToGameFunction;
@@ -45,20 +50,6 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
         }
     }
 
-    @Override
-    public void sendMessage(String msg) {
-        System.out.println("Serwer wysyła wiadomość: " + msg);
-        outputStream.println(msg);
-    }
-
-    @Override
-    public void notifySetupReadiness(String shipsStateMsg) {
-        System.out.println("Jestem READY i wysyłam moje statki");
-        serverSetupReady = true;
-        sendMessage("READY["+shipsStateMsg+"]");
-        startGameIfBothReady();
-    }
-
     private void initConnection(ServerSocket serverSocket) throws IOException {
         Socket clientSocket = serverSocket.accept();
         System.out.println("Klient połączony.");
@@ -79,7 +70,7 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
                         startGameIfBothReady();
                     } else if (msg.startsWith("SHOT")) {
                         Point point = NetworkUtils.shotMsgToPoint(msg);
-                        receiveShotFunction.accept(point);
+                        receiveShotFunction.accept(PLAYER_BOARD, point);
                     }
                 }
             } catch (IOException e) {
@@ -97,5 +88,19 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
             outputStream.println("START");
             SwingUtilities.invokeLater(goToGameFunction);
         }
+    }
+
+    @Override
+    public void sendMessage(String msg) {
+        System.out.println("Serwer wysyła wiadomość: " + msg);
+        outputStream.println(msg);
+    }
+
+    @Override
+    public void notifySetupReadiness(String shipsStateMsg) {
+        System.out.println("Jestem READY i wysyłam moje statki");
+        serverSetupReady = true;
+        sendMessage("READY["+shipsStateMsg+"]");
+        startGameIfBothReady();
     }
 }

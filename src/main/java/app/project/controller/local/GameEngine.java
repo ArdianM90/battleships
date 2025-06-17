@@ -43,8 +43,7 @@ public class GameEngine {
         return switch (boardType) {
             case FOE_BOARD -> foeShips.shotAt(point.x, point.y);
             case PLAYER_BOARD -> myShips.shotAt(point.x, point.y);
-            default ->
-                    throw new IllegalArgumentException("Błąd podczas obsługiwania strzału - niepoprawny typ planszy: " + boardType);
+            default -> throw new IllegalArgumentException("Błąd podczas obsługiwania strzału - niepoprawny typ planszy: " + boardType);
         };
     }
 
@@ -62,6 +61,10 @@ public class GameEngine {
             case PLAYER_BOARD -> myShips.countHitShips();
             default -> throw new IllegalArgumentException("Błąd podczas liczenia zatopień - niepoprawny typ planszy: " + boardType);
         };
+    }
+
+    public boolean endConditionsMet() {
+        return shipsQty == countSunkenShips(PLAYER_BOARD) || shipsQty == countSunkenShips(FOE_BOARD);
     }
 
     public boolean isMyTurn() {

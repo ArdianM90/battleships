@@ -8,8 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.function.*;
 
-import static app.project.model.BoardType.FOE_BOARD;
-import static app.project.model.BoardType.SETUP_BOARD;
+import static app.project.model.BoardType.*;
 
 public class BoardView extends JPanel {
 
@@ -36,6 +35,26 @@ public class BoardView extends JPanel {
                 add(this.shipsArr[row][col]);
             }
         }
+    }
+
+    private BoardView(BoardType boardType, int size, BiPredicate<BoardType, Point> isShipFunction) {
+        this.notifyClickFunction = null;
+        this.isShipFunction = isShipFunction;
+        this.boardType = boardType;
+        this.shipsArr = new ShipTile[size][size];
+        setLayout(new GridLayout(size, size, 1, 1));
+        setPreferredSize(new Dimension((BUTTON_SIZE + 1) * size, (BUTTON_SIZE + 1) * size));
+
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                this.shipsArr[row][col] = createTile(new Point(row, col));
+                add(this.shipsArr[row][col]);
+            }
+        }
+    }
+
+    public static BoardView SummaryBoardFactory(int size, BiPredicate<BoardType, Point> isShipFunction) {
+        return new BoardView(SUMMARY_BOARD, size, isShipFunction);
     }
 
     private ShipTile createTile(Point point) {
