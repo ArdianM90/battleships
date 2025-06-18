@@ -4,6 +4,7 @@ import app.project.model.BoardTileModel;
 import app.project.model.BoardType;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.function.BiPredicate;
 
 import static app.project.model.BoardType.FOE_BOARD;
@@ -29,7 +30,7 @@ public class GameStats {
         gameTime = end - gameTime;
     }
 
-    private long getGameTimeSeconds() {
+    public long getGameTimeSeconds() {
         return gameTime / 1000;
     }
 
@@ -48,10 +49,38 @@ public class GameStats {
         };
     }
 
+    public int getAccurateShots(BoardType boardType) {
+        return switch (boardType) {
+            case PLAYER_BOARD -> Arrays.stream(myBoardState)
+                    .flatMap(Arrays::stream)
+                    .mapToInt(e -> e.isHit() && e.isShip() ? 1 : 0)
+                    .sum();
+            case FOE_BOARD -> Arrays.stream(foeBoardState)
+                    .flatMap(Arrays::stream)
+                    .mapToInt(e -> e.isHit() && e.isShip() ? 1 : 0)
+                    .sum();
+            default -> throw new IllegalArgumentException("Nieobsługiwany typ planszy: " + boardType);
+        };
+    }
+
     public BoardTileModel[][] getBoardState(BoardType boardType) {
         return switch (boardType) {
             case PLAYER_BOARD -> myBoardState;
             case FOE_BOARD -> foeBoardState;
+            default -> throw new IllegalArgumentException("Nieobsługiwany typ planszy: " + boardType);
+        };
+    }
+
+    public int countFloatingShips(BoardType boardType) {
+        return switch (boardType) {
+            case PLAYER_BOARD -> Arrays.stream(myBoardState)
+                    .flatMap(Arrays::stream)
+                    .mapToInt(e -> !e.isHit() && e.isShip() ? 1 : 0)
+                    .sum();
+            case FOE_BOARD -> Arrays.stream(foeBoardState)
+                    .flatMap(Arrays::stream)
+                    .mapToInt(e -> !e.isHit() && e.isShip() ? 1 : 0)
+                    .sum();
             default -> throw new IllegalArgumentException("Nieobsługiwany typ planszy: " + boardType);
         };
     }

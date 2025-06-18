@@ -18,11 +18,12 @@ public class GameController {
 
     private final GameEngine localEngine;
     private final GameStats gameStats;
+    private final Runnable gotoSummaryFunction;
+
     private SocketNetworkHandler networkHandler;
     private Consumer<Point> shipsSetupClickCallback;
     private BiConsumer<BoardType, Point> drawShotCallback;
     private Consumer<Boolean> showTurnLabelCallback;
-    private Runnable gotoSummaryFunction;
 
     public GameController(int boardSize, int shipsQty, Runnable gotoSummaryFunction) {
         this.localEngine = new GameEngine(boardSize, shipsQty);
