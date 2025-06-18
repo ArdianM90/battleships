@@ -1,12 +1,13 @@
 package app.project.view;
 
-import app.project.controller.GameController;
 import app.project.controller.local.GameStats;
 
 import javax.swing.*;
 import java.awt.*;
 
 import static app.project.model.AppStage.SUMMARY;
+import static app.project.model.BoardType.FOE_BOARD;
+import static app.project.model.BoardType.PLAYER_BOARD;
 
 public class SummaryPanel extends JPanel {
 
@@ -15,9 +16,9 @@ public class SummaryPanel extends JPanel {
     private final JLabel myBoardLabel;
     private final JLabel foeBoardLabel;
 
-    public SummaryPanel(GameController gameController, GameStats stats) {
-        this.myBoardView = BoardView.SummaryBoardFactory(gameController.getBoardSize(), gameController.getIsShipFunction());
-        this.foeBoardView = BoardView.SummaryBoardFactory(gameController.getBoardSize(), gameController.getIsShipFunction());
+    public SummaryPanel(int boardSize, GameStats stats) {
+        this.myBoardView = new BoardView(PLAYER_BOARD, boardSize, stats.getBoardState(PLAYER_BOARD));
+        this.foeBoardView = new BoardView(FOE_BOARD, boardSize, stats.getBoardState(FOE_BOARD));
         this.myBoardLabel = new JLabel("Twoja plansza", SwingConstants.CENTER);
         this.foeBoardLabel = new JLabel("Plansza przeciwnika", SwingConstants.CENTER);
         initComponents();
@@ -28,13 +29,15 @@ public class SummaryPanel extends JPanel {
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 
-        JPanel boardsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
-        boardsPanel.add(createBoardWithLabel(myBoardLabel, myBoardView));
-        boardsPanel.add(createBoardWithLabel(foeBoardLabel, foeBoardView));
+        JPanel boardsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 120, 20));
+        boardsPanel.add(boardWithLabel(myBoardLabel, myBoardView));
+        boardsPanel.add(boardWithLabel(foeBoardLabel, foeBoardView));
         add(boardsPanel, BorderLayout.CENTER);
+        revalidate();
+        repaint();
     }
 
-    private JPanel createBoardWithLabel(JLabel label, BoardView board) {
+    private JPanel boardWithLabel(JLabel label, BoardView board) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);

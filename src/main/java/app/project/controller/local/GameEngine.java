@@ -1,12 +1,12 @@
 package app.project.controller.local;
 
+import app.project.model.BoardTileModel;
 import app.project.model.BoardModel;
 import app.project.model.BoardType;
 
 import java.awt.*;
 
 import static app.project.model.BoardType.*;
-
 
 public class GameEngine {
 
@@ -26,7 +26,6 @@ public class GameEngine {
 
     public void toggleMyShipAt(Point point) {
         myShips.toggleIsShip(point.x, point.y);
-        myShips.print(true);
     }
 
     public void saveOpponentShips(Boolean[][] shipsState) {
@@ -40,6 +39,8 @@ public class GameEngine {
     }
 
     public boolean saveShotAt(BoardType boardType, Point point) {
+        myShips.print(true);
+        foeShips.print(false);
         return switch (boardType) {
             case FOE_BOARD -> foeShips.shotAt(point.x, point.y);
             case PLAYER_BOARD -> myShips.shotAt(point.x, point.y);
@@ -47,8 +48,12 @@ public class GameEngine {
         };
     }
 
-    public boolean isShip(BoardType boardType, Point point) {
-        return FOE_BOARD.equals(boardType) ? foeShips.getIsShip(point.x, point.y) : myShips.getIsShip(point.x, point.y);
+    public boolean isFoeShip(Point point) {
+        return foeShips.getIsShip(point.x, point.y);
+    }
+
+    public boolean isMyShip(Point point) {
+        return myShips.getIsShip(point.x, point.y);
     }
 
     public boolean[][] getMyShipPositions() {
@@ -81,5 +86,13 @@ public class GameEngine {
 
     public int getShipsQty() {
         return shipsQty;
+    }
+
+    public BoardTileModel[][] getBoardState(BoardType boardType) {
+        return switch (boardType) {
+            case FOE_BOARD -> foeShips.getCells();
+            case PLAYER_BOARD -> myShips.getCells();
+            default -> null;
+        };
     }
 }

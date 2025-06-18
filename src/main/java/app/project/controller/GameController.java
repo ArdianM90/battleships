@@ -1,6 +1,7 @@
 package app.project.controller;
 
 import app.project.controller.local.GameEngine;
+import app.project.controller.local.GameStats;
 import app.project.controller.networking.ClientHandler;
 import app.project.controller.networking.NetworkUtils;
 import app.project.controller.networking.ServerHandler;
@@ -16,6 +17,7 @@ import static app.project.model.BoardType.PLAYER_BOARD;
 public class GameController {
 
     private final GameEngine localEngine;
+    private final GameStats gameStats;
     private SocketNetworkHandler networkHandler;
     private Consumer<Point> shipsSetupClickCallback;
     private BiConsumer<BoardType, Point> drawShotCallback;
@@ -25,6 +27,7 @@ public class GameController {
     public GameController(int boardSize, int shipsQty, Runnable gotoSummaryFunction) {
         this.localEngine = new GameEngine(boardSize, shipsQty);
         this.gotoSummaryFunction = gotoSummaryFunction;
+        this.gameStats = new GameStats();
     }
 
     public void loadInitialShipsPositions(boolean[][] shipsSetup) {
@@ -50,7 +53,6 @@ public class GameController {
                     handleShot(FOE_BOARD, point);
                 }
             }
-            default -> throw new IllegalArgumentException("Niepoprawny typ planszy: " + boardType);
         }
     }
 
@@ -70,6 +72,7 @@ public class GameController {
             }
             showTurnLabelCallback.accept(enemyShoot);
             if (localEngine.endConditionsMet()) {
+                gameStats.fillBoardStates(localEngine.getBoardState(PLAYER_BOARD), localEngine.getBoardState(FOE_BOARD));
                 gotoSummaryFunction.run();
             } else {
                 localEngine.setMyTurn(enemyShoot);
@@ -89,8 +92,11 @@ public class GameController {
         this.drawShotCallback = drawShotCallback;
     }
 
-    public BiPredicate<BoardType, Point> getIsShipFunction() {
-        return localEngine::isShip;
+    public Predicate<Point> getIsShipFunction(BoardType boardType) {
+        return switch (boardType) {
+            case SETUP_BOARD, PLAYER_BOARD -> localEngine::isMyShip;
+            case FOE_BOARD -> localEngine::isFoeShip;
+        };
     }
 
     public Function<BoardType, Integer> getCountSunkenShipsFunction() {
@@ -124,5 +130,9 @@ public class GameController {
 
     public int getShipsPerBoardQty() {
         return localEngine.getShipsQty();
+    }
+
+    public GameStats getStats() {
+        return this.gameStats;
     }
 }

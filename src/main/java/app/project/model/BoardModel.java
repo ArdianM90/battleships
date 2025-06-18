@@ -3,13 +3,13 @@ package app.project.model;
 import java.util.Arrays;
 
 public class BoardModel {
-    private BoardCellModel[][] shipCells;
+    private BoardTileModel[][] shipCells;
 
     public BoardModel(int size) {
-        this.shipCells = new BoardCellModel[size][size];
+        this.shipCells = new BoardTileModel[size][size];
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
-                shipCells[row][col] = new BoardCellModel();
+                shipCells[row][col] = new BoardTileModel();
             }
         }
     }
@@ -56,9 +56,13 @@ public class BoardModel {
         System.out.println((myShips ? "My" : "Foe") + " ships:");
         for (int row = 0; row < shipCells.length; row++) {
             for (int col = 0; col < shipCells.length; col++) {
-                System.out.print(shipCells[row][col].isShip() ? "X " : "- ");
+                System.out.print((shipCells[row][col].isShip() ? "O" : "-") + (shipCells[row][col].isHit() ? "X " : "- "));
             }
             System.out.println();
         }
+    }
+
+    public BoardTileModel[][] getCells() {
+        return shipCells;
     }
 }

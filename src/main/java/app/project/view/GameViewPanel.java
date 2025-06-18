@@ -24,8 +24,8 @@ public class GameViewPanel extends JPanel {
 
     public GameViewPanel(GameController gameController) {
         this.countHitsQtyFunction = gameController.getCountSunkenShipsFunction();
-        this.myBoardView = new BoardView(PLAYER_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.getIsShipFunction());
-        this.foeBoardView = new BoardView(FOE_BOARD, gameController.getBoardSize(), gameController::handleBoardClick, gameController.getIsShipFunction());
+        this.myBoardView = new BoardView(PLAYER_BOARD, gameController.getBoardSize(), gameController.getIsShipFunction(PLAYER_BOARD), gameController::handleBoardClick);
+        this.foeBoardView = new BoardView(FOE_BOARD, gameController.getBoardSize(), gameController.getIsShipFunction(FOE_BOARD), gameController::handleBoardClick);
         this.myBoardLabel = new JLabel("", SwingConstants.CENTER);
         this.foeBoardLabel = new JLabel("", SwingConstants.CENTER);
         this.shipsPerBoardQty = gameController.getShipsPerBoardQty();
@@ -38,6 +38,7 @@ public class GameViewPanel extends JPanel {
         setName(GAME.name());
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
+
         JPanel topPanel = new JPanel(new BorderLayout());
         this.turnLabel = new JLabel(isServer ? "TWOJA TURA" : "PRZECIWNIK ZACZYNA", SwingConstants.CENTER);
         turnLabel.setForeground(isServer ? Color.GREEN.darker() : Color.RED);
@@ -46,14 +47,14 @@ public class GameViewPanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
         JPanel boardsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
-        boardsPanel.add(createBoardWithLabel(myBoardLabel, myBoardView));
-        boardsPanel.add(createBoardWithLabel(foeBoardLabel, foeBoardView));
+        boardsPanel.add(boardWithLabel(myBoardLabel, myBoardView));
+        boardsPanel.add(boardWithLabel(foeBoardLabel, foeBoardView));
         add(boardsPanel, BorderLayout.CENTER);
         updateBoardLabel(PLAYER_BOARD, 0, shipsPerBoardQty);
         updateBoardLabel(FOE_BOARD, 0, shipsPerBoardQty);
     }
 
-    private JPanel createBoardWithLabel(JLabel label, BoardView board) {
+    private JPanel boardWithLabel(JLabel label, BoardView board) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);

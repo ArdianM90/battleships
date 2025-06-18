@@ -98,7 +98,6 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
 
     @Override
     public void notifySetupReadiness(String shipsStateMsg) {
-        System.out.println("Jestem READY i wysyłam moje statki");
         serverSetupReady = true;
         sendMessage("READY["+shipsStateMsg+"]");
         startGameIfBothReady();

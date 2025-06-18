@@ -7,8 +7,6 @@ import static app.project.model.AppStage.*;
 
 public class OverlayFrame extends JFrame {
 
-    private static final int SUMMARY_DELAY_SECONDS = 2;
-
     private final CardLayout layout;
     private final JPanel cardPanel;
 
@@ -37,11 +35,7 @@ public class OverlayFrame extends JFrame {
     }
 
     public void switchToSummaryPanel() {
-        new Timer(SUMMARY_DELAY_SECONDS * 1000, e -> {
-            SwingUtilities.invokeLater(() -> layout.show(cardPanel, SUMMARY.name()));
-        }) {{
-            setRepeats(false);
-            start();
-        }};
+        JOptionPane.showConfirmDialog(this, "Gra dobiegła końca. Naciśnij OK aby przejść do podsumowania", "Koniec gry", JOptionPane.DEFAULT_OPTION);
+        SwingUtilities.invokeLater(() -> layout.show(cardPanel, SUMMARY.name()));
     }
 }
