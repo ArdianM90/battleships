@@ -9,7 +9,6 @@ import app.project.controller.networking.SocketNetworkHandler;
 import app.project.model.BoardType;
 
 import java.awt.*;
-import java.util.Objects;
 import java.util.function.*;
 
 import static app.project.model.BoardType.FOE_BOARD;
@@ -30,6 +29,12 @@ public class GameController {
     public GameController(int boardSize, int shipsQty, Runnable gotoSummaryFunction) {
         this.localEngine = new GameEngine(boardSize, shipsQty);
         this.gotoSummaryFunction = gotoSummaryFunction;
+    }
+
+    public void createClientSocket(String host, int port, Runnable goToSetupFunction, Runnable goToGameFunction, Runnable showErrorFunction) {
+        ClientHandler client = new ClientHandler(host, port, goToSetupFunction, goToGameFunction, showErrorFunction, this::setOpponentShipsState, this::proceedShot);
+        client.start();
+        setNetworkHandler(client);
     }
 
     public void loadInitialShipsPositions(boolean[][] shipsSetup) {
@@ -117,9 +122,6 @@ public class GameController {
     }
 
     public void setNetworkHandler(SocketNetworkHandler handler) {
-        if (Objects.nonNull(this.networkHandler)) {
-            throw new IllegalStateException("NetworkHandler już istnieje.");
-        }
         localEngine.setMyTurn(handler instanceof ServerHandler);
         this.networkHandler = handler;
     }

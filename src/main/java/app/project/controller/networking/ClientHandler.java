@@ -16,7 +16,9 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
 
     private final int port;
     private final String host;
+    private final Runnable goToSetupFunction;
     private final Runnable goToGameFunction;
+    private final Runnable showErrorFunction;
     private final Consumer<Boolean[][]> setOpponentShipsFunction;
     private final BiConsumer<BoardType, Point> receiveShotFunction;
 
@@ -24,11 +26,13 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
     private PrintWriter outputStream;
     private BufferedReader inputStream;
 
-    public ClientHandler(String host, int port, Runnable goToGameFunction, Consumer<Boolean[][]> setOpponentShipsFunction, BiConsumer<BoardType, Point> receiveShotFunction) {
+    public ClientHandler(String host, int port, Runnable goToSetupFunction, Runnable goToGameFunction, Runnable showErrorFunction, Consumer<Boolean[][]> setOpponentShipsFunction, BiConsumer<BoardType, Point> receiveShotFunction) {
         this.socket = null;
         this.host = host;
         this.port = port;
+        this.goToSetupFunction = goToSetupFunction;
         this.goToGameFunction = goToGameFunction;
+        this.showErrorFunction = showErrorFunction;
         this.setOpponentShipsFunction = setOpponentShipsFunction;
         this.receiveShotFunction = receiveShotFunction;
     }
@@ -38,10 +42,11 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
         try {
             socket = new Socket(host, port);
             initConnection(socket);
+            SwingUtilities.invokeLater(goToSetupFunction);
             serverMessagesListenerThread().start();
         } catch (IOException e) {
             System.err.println("Błąd klienta: " + e.getMessage());
-            e.printStackTrace();
+            SwingUtilities.invokeLater(showErrorFunction);
         }
     }
 

@@ -1,7 +1,6 @@
 package app.project.view;
 
 import app.project.controller.GameController;
-import app.project.controller.networking.ClientHandler;
 import app.project.controller.networking.ServerHandler;
 
 import javax.swing.*;
@@ -15,14 +14,14 @@ public class MainMenuPanel extends JPanel {
     private static final String HOST = "127.0.0.1";
 
     private final GameController gameController;
-    private final Runnable goToShipsSetupFunction;
+    private final Runnable goToSetupFunction;
     private final Runnable goToGameFunction;
 
     public MainMenuPanel(GameController gameController,
-                         Runnable goToShipsSetupFunction,
+                         Runnable goToSetupFunction,
                          Runnable goToGameFunction) {
         this.gameController = gameController;
-        this.goToShipsSetupFunction = goToShipsSetupFunction;
+        this.goToSetupFunction = goToSetupFunction;
         this.goToGameFunction = goToGameFunction;
         initComponents();
     }
@@ -56,15 +55,15 @@ public class MainMenuPanel extends JPanel {
         server.start();
         gameController.setNetworkHandler(server);
         System.out.println("Serwer przechodzi do edycji.");
-        goToShipsSetupFunction.run();
+        goToSetupFunction.run();
     }
 
     private void clientOnClickAction() {
-        // todo: przenieść logikę sieciową do kontrolera
-        ClientHandler client = new ClientHandler(HOST, PORT, goToGameFunction, gameController::setOpponentShipsState, gameController::proceedShot);
-        client.start();
-        gameController.setNetworkHandler(client);
+        gameController.createClientSocket(HOST, PORT, goToSetupFunction, goToGameFunction,  this::showErrorMsgDialog);
         System.out.println("Klient przechodzi do edycji.");
-        goToShipsSetupFunction.run();
+    }
+
+    private void showErrorMsgDialog() {
+        JOptionPane.showConfirmDialog(this, "Nie udało się odnaleźć serwera gry. Załóż serwer lub poczekaj aż drugi gracz go założy.", "Nie odnaleziono serwera", JOptionPane.DEFAULT_OPTION);
     }
 }

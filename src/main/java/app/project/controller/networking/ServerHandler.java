@@ -49,7 +49,6 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
             }
         } catch (Exception e) {
             System.err.println("Błąd serwera: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
