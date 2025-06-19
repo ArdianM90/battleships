@@ -16,6 +16,8 @@ public class SummaryPanel extends JPanel {
     private final BoardView foeBoardView;
     private final JLabel myBoardLabel = new JLabel("Twoja plansza", SwingConstants.CENTER);
     private final JLabel foeBoardLabel = new JLabel("Plansza przeciwnika", SwingConstants.CENTER);
+    private final JLabel myShotsLabel = new JLabel("Twoje strzały", SwingConstants.CENTER);
+    private final JLabel foeShotsLabel = new JLabel("Strzały przeciwnika", SwingConstants.CENTER);
 
     public SummaryPanel(int boardSize, GameStats stats) {
         this.myBoardView = new BoardView(PLAYER_BOARD, boardSize, stats.getBoardState(PLAYER_BOARD));
@@ -28,17 +30,28 @@ public class SummaryPanel extends JPanel {
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 
+        JLabel winnerLabel = new JLabel(stats.isWinner() ? "Wygrałeś" : "Wygrał przeciwnik");
+        winnerLabel.setFont(winnerLabel.getFont().deriveFont(Font.BOLD, 22f));
+        winnerLabel.setForeground(stats.isWinner() ? Color.GREEN.darker() : Color.RED);
+        winnerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        topPanel.add(winnerLabel);
+        add(topPanel, BorderLayout.NORTH);
+
         JPanel boardsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 120, 20));
         JLabel[] myDetails = fillDetailLabels(stats, PLAYER_BOARD);
         JLabel[] foeDetails = fillDetailLabels(stats, FOE_BOARD);
-        boardsPanel.add(boardWithLabel(myBoardLabel, myBoardView, myDetails));
-        boardsPanel.add(boardWithLabel(foeBoardLabel, foeBoardView, foeDetails));
+        boardsPanel.add(prepareColumn(foeBoardLabel, foeBoardView, myShotsLabel, foeDetails));
+        boardsPanel.add(prepareColumn(myBoardLabel, myBoardView, foeShotsLabel, myDetails));
         add(boardsPanel, BorderLayout.CENTER);
 
         long seconds = stats.getGameTimeSeconds();
         JLabel timeLabel = new JLabel(String.format("Czas gry: %02d:%02d", seconds / 60, seconds % 60));
+        timeLabel.setFont(timeLabel.getFont().deriveFont(Font.BOLD, 18f));
         timeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 40, 0));
         bottomPanel.add(timeLabel);
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -60,16 +73,20 @@ public class SummaryPanel extends JPanel {
         };
     }
 
-    private JPanel boardWithLabel(JLabel label, BoardView board, JLabel[] detailsArray) {
+    private JPanel prepareColumn(JLabel boardLabel, BoardView board, JLabel detailsLabel, JLabel[] detailsArray) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        label.setFont(label.getFont().deriveFont(Font.BOLD, 16f));
-        panel.add(label);
+        boardLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        boardLabel.setFont(boardLabel.getFont().deriveFont(Font.BOLD, 16f));
+        panel.add(boardLabel);
         panel.add(Box.createVerticalStrut(10));
         panel.add(board);
-        panel.add(Box.createVerticalStrut(10));
+        panel.add(Box.createVerticalStrut(20));
 
+        detailsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        detailsLabel.setFont(boardLabel.getFont().deriveFont(Font.BOLD, 16f));
+        panel.add(detailsLabel);
+        panel.add(Box.createVerticalStrut(10));
         JPanel statsPanel = new JPanel(new GridLayout(detailsArray.length, 1, 0, 5));
         for (JLabel statLabel : detailsArray) {
             statLabel.setFont(statLabel.getFont().deriveFont(Font.PLAIN, 14f));
@@ -77,7 +94,6 @@ public class SummaryPanel extends JPanel {
         }
         statsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(statsPanel);
-
         return panel;
     }
 }

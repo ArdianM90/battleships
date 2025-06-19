@@ -3,29 +3,25 @@ package app.project.controller.local;
 import app.project.model.BoardTileModel;
 import app.project.model.BoardType;
 
-import java.awt.*;
 import java.util.Arrays;
-import java.util.function.BiPredicate;
 
 import static app.project.model.BoardType.FOE_BOARD;
 
 public class GameStats {
     private long gameTime;
-    private int myTotalShots = 0;
-    private int foeTotalShots = 0;
     private BoardTileModel[][] myBoardState = null;
     private BoardTileModel[][] foeBoardState = null;
+
+    public GameStats() {
+        this.gameTime = System.currentTimeMillis();
+    }
 
     public void fillBoardStates(BoardTileModel[][] myBoardState, BoardTileModel[][] foeBoardState) {
         this.myBoardState = myBoardState;
         this.foeBoardState = foeBoardState;
     }
 
-    private void startTimer() {
-        gameTime = System.currentTimeMillis();
-    }
-
-    private void stopTimer() {
+    public void stopTimer() {
         long end = System.currentTimeMillis();
         gameTime = end - gameTime;
     }
@@ -34,17 +30,16 @@ public class GameStats {
         return gameTime / 1000;
     }
 
-    public void addShot(BoardType boardType) {
-        switch (boardType) {
-            case PLAYER_BOARD -> myTotalShots++;
-            case FOE_BOARD -> foeTotalShots++;
-        }
-    }
-
     public int getTotalShots(BoardType boardType) {
         return switch (boardType) {
-            case PLAYER_BOARD -> myTotalShots;
-            case FOE_BOARD -> foeTotalShots;
+            case PLAYER_BOARD -> Arrays.stream(myBoardState)
+                    .flatMap(Arrays::stream)
+                    .mapToInt(tile -> tile.isHit() ? 1 : 0)
+                    .sum();
+            case FOE_BOARD -> Arrays.stream(foeBoardState)
+                    .flatMap(Arrays::stream)
+                    .mapToInt(tile -> tile.isHit() ? 1 : 0)
+                    .sum();
             default -> throw new IllegalArgumentException("Nieobsługiwany typ planszy: " + boardType);
         };
     }
@@ -53,11 +48,11 @@ public class GameStats {
         return switch (boardType) {
             case PLAYER_BOARD -> Arrays.stream(myBoardState)
                     .flatMap(Arrays::stream)
-                    .mapToInt(e -> e.isHit() && e.isShip() ? 1 : 0)
+                    .mapToInt(tile -> tile.isHit() && tile.isShip() ? 1 : 0)
                     .sum();
             case FOE_BOARD -> Arrays.stream(foeBoardState)
                     .flatMap(Arrays::stream)
-                    .mapToInt(e -> e.isHit() && e.isShip() ? 1 : 0)
+                    .mapToInt(tile -> tile.isHit() && tile.isShip() ? 1 : 0)
                     .sum();
             default -> throw new IllegalArgumentException("Nieobsługiwany typ planszy: " + boardType);
         };
@@ -85,13 +80,7 @@ public class GameStats {
         };
     }
 
-    public BiPredicate<BoardType, Point> getIsShipFunction() {
-        return (boardType, point) -> {
-            if (FOE_BOARD.equals(boardType)) {
-                return foeBoardState[point.x][point.y].isShip();
-            } else {
-                return myBoardState[point.x][point.y].isShip();
-            }
-        };
+    public boolean isWinner() {
+        return countFloatingShips(FOE_BOARD) == 0;
     }
 }

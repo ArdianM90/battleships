@@ -31,17 +31,18 @@ public class GameViewPanel extends JPanel {
         this.shipsPerBoardQty = gameController.getShipsPerBoardQty();
         gameController.setDrawShotCallback(this::drawShotOnBoard);
         gameController.setTurnLabelCallback(this::switchTurnLabel);
-        initComponents(gameController.isServer());
+        gameController.startTimer();
+        initComponents(gameController.isMyTurn());
     }
 
-    private void initComponents(boolean isServer) {
+    private void initComponents(boolean isMyTurn) {
         setName(GAME.name());
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 
         JPanel topPanel = new JPanel(new BorderLayout());
-        this.turnLabel = new JLabel(isServer ? "TWOJA TURA" : "PRZECIWNIK ZACZYNA", SwingConstants.CENTER);
-        turnLabel.setForeground(isServer ? Color.GREEN.darker() : Color.RED);
+        this.turnLabel = new JLabel(isMyTurn ? "TWOJA TURA" : "PRZECIWNIK ZACZYNA", SwingConstants.CENTER);
+        turnLabel.setForeground(isMyTurn ? Color.GREEN.darker() : Color.RED);
         turnLabel.setFont(turnLabel.getFont().deriveFont(Font.BOLD, 18f));
         topPanel.add(turnLabel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);

@@ -17,8 +17,9 @@ import static app.project.model.BoardType.PLAYER_BOARD;
 public class GameController {
 
     private final GameEngine localEngine;
-    private final GameStats gameStats;
     private final Runnable gotoSummaryFunction;
+
+    private GameStats gameStats;
 
     private SocketNetworkHandler networkHandler;
     private Consumer<Point> shipsSetupClickCallback;
@@ -28,7 +29,6 @@ public class GameController {
     public GameController(int boardSize, int shipsQty, Runnable gotoSummaryFunction) {
         this.localEngine = new GameEngine(boardSize, shipsQty);
         this.gotoSummaryFunction = gotoSummaryFunction;
-        this.gameStats = new GameStats();
     }
 
     public void loadInitialShipsPositions(boolean[][] shipsSetup) {
@@ -73,6 +73,7 @@ public class GameController {
             }
             showTurnLabelCallback.accept(enemyShoot);
             if (localEngine.endConditionsMet()) {
+                gameStats.stopTimer();
                 gameStats.fillBoardStates(localEngine.getBoardState(PLAYER_BOARD), localEngine.getBoardState(FOE_BOARD));
                 gotoSummaryFunction.run();
             } else {
@@ -113,6 +114,10 @@ public class GameController {
         return null;
     }
 
+    public boolean isMyTurn() {
+        return localEngine.isMyTurn();
+    }
+
     public void setNetworkHandler(SocketNetworkHandler handler) {
         if (this.networkHandler != null) {
             throw new IllegalStateException("NetworkHandler już istnieje.");
@@ -131,6 +136,10 @@ public class GameController {
 
     public int getShipsPerBoardQty() {
         return localEngine.getShipsQty();
+    }
+
+    public void startTimer() {
+        this.gameStats = new GameStats();
     }
 
     public GameStats getStats() {
