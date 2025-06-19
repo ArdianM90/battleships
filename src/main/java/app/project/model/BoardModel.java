@@ -40,16 +40,20 @@ public class BoardModel {
         shipCells[x][y].setIsShip(true);
     }
 
-    public boolean getIsShip(int x, int y) {
+    public boolean isShip(int x, int y) {
         return shipCells[x][y].isShip();
     }
 
-    public boolean shotAt(int x, int y) {
+    public boolean isShot(int x, int y) {
+        return shipCells[x][y].isHit();
+    }
+
+    public boolean shot(int x, int y) {
         if (shipCells[x][y].isHit()) {
             return false;
         }
         shipCells[x][y].setHit();
-        return true;
+        return shipCells[x][y].isShip();
     }
 
     public void print(boolean myShips) {

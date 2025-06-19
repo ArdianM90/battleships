@@ -25,7 +25,7 @@ public class GameController {
     private SocketNetworkHandler networkHandler;
     private Consumer<Point> shipsSetupClickCallback;
     private BiConsumer<BoardType, Point> drawShotCallback;
-    private Consumer<Boolean> showTurnLabelCallback;
+    private Consumer<Boolean> turnLabelCallback;
 
     public GameController(int boardSize, int shipsQty, Runnable gotoSummaryFunction) {
         this.localEngine = new GameEngine(boardSize, shipsQty);
@@ -36,7 +36,7 @@ public class GameController {
         for (int row = 0; row < getBoardSize(); row++) {
             for (int col = 0; col < getBoardSize(); col++) {
                 if (shipsSetup[row][col]) {
-                    handleShipSetup(new Point(row, col));
+                    handleSetupClick(new Point(row, col));
                 }
             }
         }
@@ -49,37 +49,34 @@ public class GameController {
 
     public void handleBoardClick(BoardType boardType, Point point) {
         switch (boardType) {
-            case SETUP_BOARD -> handleShipSetup(point);
-            case FOE_BOARD -> {
-                if (localEngine.isMyTurn()) {
-                    handleShot(FOE_BOARD, point);
-                }
-            }
+            case SETUP_BOARD -> handleSetupClick(point);
+            case FOE_BOARD -> handleShotClick(point);
         }
     }
 
-    private void handleShipSetup(Point point) {
+    private void handleSetupClick(Point point) {
         localEngine.toggleMyShipAt(point);
         shipsSetupClickCallback.accept(point);
     }
 
-    public void handleShot(BoardType targetBoard, Point point) {
-        boolean success = localEngine.saveShotAt(targetBoard, point);
-        boolean enemyShoot = PLAYER_BOARD.equals(targetBoard);
-        if (success) {
-            drawShotCallback.accept(targetBoard, point);
-            if (!enemyShoot) {
-                String shotMsg = NetworkUtils.pointToShotMsg(point);
-                networkHandler.sendMessage(shotMsg);
-            }
-            showTurnLabelCallback.accept(enemyShoot);
-            if (localEngine.endConditionsMet()) {
-                gameStats.stopTimer();
-                gameStats.fillBoardStates(localEngine.getBoardState(PLAYER_BOARD), localEngine.getBoardState(FOE_BOARD));
-                gotoSummaryFunction.run();
-            } else {
-                localEngine.setMyTurn(enemyShoot);
-            }
+    private void handleShotClick(Point point) {
+        boolean targetNotShot = !localEngine.isShot(FOE_BOARD, point);
+        if (localEngine.isMyTurn() && targetNotShot) {
+            proceedShot(FOE_BOARD, point);
+        }
+    }
+
+    public void proceedShot(BoardType targetBoard, Point point) {
+        localEngine.shotAt(targetBoard, point);
+        drawShotCallback.accept(targetBoard, point);
+        if (FOE_BOARD.equals(targetBoard)) {
+            networkHandler.sendMessage(NetworkUtils.pointToShotMsg(point));
+        }
+        if (localEngine.endConditionsMet()) {
+            gameStats.saveFinalState(localEngine.getBoardState(PLAYER_BOARD), localEngine.getBoardState(FOE_BOARD));
+            gotoSummaryFunction.run();
+        } else {
+            turnLabelCallback.accept(localEngine.isMyTurn());
         }
     }
 
@@ -87,8 +84,8 @@ public class GameController {
         this.shipsSetupClickCallback = shipsSetupClickCallback;
     }
 
-    public void setTurnLabelCallback(Consumer<Boolean> showTurnLabelCallback) {
-        this.showTurnLabelCallback = showTurnLabelCallback;
+    public void setTurnLabelCallback(Consumer<Boolean> turnLabelCallback) {
+        this.turnLabelCallback = turnLabelCallback;
     }
 
     public void setDrawShotCallback(BiConsumer<BoardType, Point> drawShotCallback) {

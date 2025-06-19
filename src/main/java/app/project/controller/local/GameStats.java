@@ -16,12 +16,13 @@ public class GameStats {
         this.gameTime = System.currentTimeMillis();
     }
 
-    public void fillBoardStates(BoardTileModel[][] myBoardState, BoardTileModel[][] foeBoardState) {
+    public void saveFinalState(BoardTileModel[][] myBoardState, BoardTileModel[][] foeBoardState) {
         this.myBoardState = myBoardState;
         this.foeBoardState = foeBoardState;
+        stopTimer();
     }
 
-    public void stopTimer() {
+    private void stopTimer() {
         long end = System.currentTimeMillis();
         gameTime = end - gameTime;
     }

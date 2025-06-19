@@ -38,22 +38,25 @@ public class GameEngine {
         }
     }
 
-    public boolean saveShotAt(BoardType boardType, Point point) {
+    public void shotAt(BoardType targetBoard, Point point) {
         myShips.print(true);
         foeShips.print(false);
-        return switch (boardType) {
-            case FOE_BOARD -> foeShips.shotAt(point.x, point.y);
-            case PLAYER_BOARD -> myShips.shotAt(point.x, point.y);
-            default -> throw new IllegalArgumentException("Błąd podczas obsługiwania strzału - niepoprawny typ planszy: " + boardType);
+        boolean shipHit = switch (targetBoard) {
+            case PLAYER_BOARD -> myShips.shot(point.x, point.y);
+            case FOE_BOARD -> foeShips.shot(point.x, point.y);
+            default -> throw new IllegalArgumentException("Błąd podczas obsługiwania strzału - niepoprawny typ planszy: " + targetBoard);
         };
+        if (!shipHit) {
+            myTurn = !myTurn;
+        }
     }
 
     public boolean isFoeShip(Point point) {
-        return foeShips.getIsShip(point.x, point.y);
+        return foeShips.isShip(point.x, point.y);
     }
 
     public boolean isMyShip(Point point) {
-        return myShips.getIsShip(point.x, point.y);
+        return myShips.isShip(point.x, point.y);
     }
 
     public boolean[][] getMyShipPositions() {
@@ -74,6 +77,14 @@ public class GameEngine {
 
     public boolean isMyTurn() {
         return myTurn;
+    }
+
+    public boolean isShot(BoardType boardType, Point point) {
+        return switch (boardType) {
+            case FOE_BOARD -> foeShips.isShot(point.x, point.y);
+            case PLAYER_BOARD -> myShips.isShot(point.x, point.y);
+            default -> throw new IllegalArgumentException("Nieobsługiwany typ planszy: " + boardType);
+        };
     }
 
     public void setMyTurn(boolean myTurn) {
