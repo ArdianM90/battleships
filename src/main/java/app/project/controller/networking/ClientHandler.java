@@ -1,10 +1,15 @@
 package app.project.controller.networking;
 
+import app.project.model.BoardType;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.net.Socket;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import static app.project.model.BoardType.PLAYER_BOARD;
 
 public class ClientHandler extends Thread implements SocketNetworkHandler {
 
@@ -12,13 +17,13 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
     private final String host;
     private final Runnable goToGameFunction;
     private final Consumer<Boolean[][]> setOpponentShipsFunction;
-    private final Consumer<Point> receiveShotFunction;
+    private final BiConsumer<BoardType, Point> receiveShotFunction;
 
     private Socket socket;
     private PrintWriter outputStream;
     private BufferedReader inputStream;
 
-    public ClientHandler(String host, int port, Runnable goToGameFunction, Consumer<Boolean[][]> setOpponentShipsFunction, Consumer<Point> receiveShotFunction) {
+    public ClientHandler(String host, int port, Runnable goToGameFunction, Consumer<Boolean[][]> setOpponentShipsFunction, BiConsumer<BoardType, Point> receiveShotFunction) {
         this.socket = null;
         this.host = host;
         this.port = port;
@@ -58,7 +63,7 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
                         setOpponentShipsFunction.accept(opponentShips);
                     } else if (msg.startsWith("SHOT")) {
                         Point point = NetworkUtils.shotMsgToPoint(msg);
-                        receiveShotFunction.accept(point);
+                        receiveShotFunction.accept(PLAYER_BOARD, point);
                     }
                 }
             } catch (IOException e) {

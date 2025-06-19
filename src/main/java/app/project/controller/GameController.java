@@ -1,6 +1,7 @@
 package app.project.controller;
 
 import app.project.controller.local.GameEngine;
+import app.project.controller.local.GameStats;
 import app.project.controller.networking.ClientHandler;
 import app.project.controller.networking.NetworkUtils;
 import app.project.controller.networking.ServerHandler;
@@ -16,13 +17,18 @@ import static app.project.model.BoardType.PLAYER_BOARD;
 public class GameController {
 
     private final GameEngine localEngine;
+    private final Runnable gotoSummaryFunction;
+
+    private GameStats gameStats;
+
     private SocketNetworkHandler networkHandler;
     private Consumer<Point> shipsSetupClickCallback;
     private BiConsumer<BoardType, Point> drawShotCallback;
-    private Consumer<Boolean> showMyTurnLabelCallback;
+    private Consumer<Boolean> showTurnLabelCallback;
 
-    public GameController(int boardSize, int shipsQty) {
-        localEngine = new GameEngine(boardSize, shipsQty);
+    public GameController(int boardSize, int shipsQty, Runnable gotoSummaryFunction) {
+        this.localEngine = new GameEngine(boardSize, shipsQty);
+        this.gotoSummaryFunction = gotoSummaryFunction;
     }
 
     public void loadInitialShipsPositions(boolean[][] shipsSetup) {
@@ -45,10 +51,9 @@ public class GameController {
             case SETUP_BOARD -> handleShipSetup(point);
             case FOE_BOARD -> {
                 if (localEngine.isMyTurn()) {
-                    handleMyShot(point);
+                    handleShot(FOE_BOARD, point);
                 }
             }
-            default -> throw new IllegalArgumentException("Niepoprawny typ planszy: " + boardType);
         }
     }
 
@@ -57,23 +62,23 @@ public class GameController {
         shipsSetupClickCallback.accept(point);
     }
 
-    private void handleMyShot(Point point) {
-        boolean success = localEngine.saveShotAt(FOE_BOARD, point);
+    public void handleShot(BoardType targetBoard, Point point) {
+        boolean success = localEngine.saveShotAt(targetBoard, point);
+        boolean enemyShoot = PLAYER_BOARD.equals(targetBoard);
         if (success) {
-            drawShotCallback.accept(FOE_BOARD, point);
-            String shotMsg = NetworkUtils.pointToShotMsg(point);
-            networkHandler.sendMessage(shotMsg);
-            showMyTurnLabelCallback.accept(false);
-            localEngine.setMyTurn(false);
-        }
-    }
-
-    public void handleOpponentShot(Point point) {
-        boolean success = localEngine.saveShotAt(PLAYER_BOARD, point);
-        if (success) {
-            drawShotCallback.accept(PLAYER_BOARD, point);
-            showMyTurnLabelCallback.accept(true);
-            localEngine.setMyTurn(true);
+            drawShotCallback.accept(targetBoard, point);
+            if (!enemyShoot) {
+                String shotMsg = NetworkUtils.pointToShotMsg(point);
+                networkHandler.sendMessage(shotMsg);
+            }
+            showTurnLabelCallback.accept(enemyShoot);
+            if (localEngine.endConditionsMet()) {
+                gameStats.stopTimer();
+                gameStats.fillBoardStates(localEngine.getBoardState(PLAYER_BOARD), localEngine.getBoardState(FOE_BOARD));
+                gotoSummaryFunction.run();
+            } else {
+                localEngine.setMyTurn(enemyShoot);
+            }
         }
     }
 
@@ -81,16 +86,19 @@ public class GameController {
         this.shipsSetupClickCallback = shipsSetupClickCallback;
     }
 
-    public void setMyTurnLabelCallback(Consumer<Boolean> showMyTurnLabelCallback) {
-        this.showMyTurnLabelCallback = showMyTurnLabelCallback;
+    public void setTurnLabelCallback(Consumer<Boolean> showTurnLabelCallback) {
+        this.showTurnLabelCallback = showTurnLabelCallback;
     }
 
     public void setDrawShotCallback(BiConsumer<BoardType, Point> drawShotCallback) {
         this.drawShotCallback = drawShotCallback;
     }
 
-    public BiPredicate<BoardType, Point> getIsShipFunction() {
-        return localEngine::isShip;
+    public Predicate<Point> getIsShipFunction(BoardType boardType) {
+        return switch (boardType) {
+            case SETUP_BOARD, PLAYER_BOARD -> localEngine::isMyShip;
+            case FOE_BOARD -> localEngine::isFoeShip;
+        };
     }
 
     public Function<BoardType, Integer> getCountSunkenShipsFunction() {
@@ -104,6 +112,10 @@ public class GameController {
             return false;
         }
         return null;
+    }
+
+    public boolean isMyTurn() {
+        return localEngine.isMyTurn();
     }
 
     public void setNetworkHandler(SocketNetworkHandler handler) {
@@ -124,5 +136,13 @@ public class GameController {
 
     public int getShipsPerBoardQty() {
         return localEngine.getShipsQty();
+    }
+
+    public void startTimer() {
+        this.gameStats = new GameStats();
+    }
+
+    public GameStats getStats() {
+        return this.gameStats;
     }
 }
