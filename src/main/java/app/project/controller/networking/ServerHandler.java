@@ -64,7 +64,7 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
         Thread listenerThread = new Thread(() -> {
             try {
                 String msg;
-                while ((msg = inputStream.readLine()) != null) {
+                while (Objects.nonNull(msg = inputStream.readLine())) {
                     System.out.println("Serwer otrzymał: " + msg);
                     if (msg.startsWith("READY")) {
                         Boolean[][] opponentShips = NetworkUtils.readyMsgToShipsArray(msg);

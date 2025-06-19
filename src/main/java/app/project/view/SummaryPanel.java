@@ -69,7 +69,7 @@ public class SummaryPanel extends JPanel {
                 new JLabel(String.format("Oddane strzały: %d", totalShots)),
                 new JLabel(String.format("Celne strzały: %d", accurateShots)),
                 new JLabel(String.format("Celność: %.2f%%", accurateShots * 100.0 / totalShots)),
-                new JLabel(String.format("Pozostałe statki: %d", stats.countFloatingShips(boardType)))
+                new JLabel(String.format("Pozostawione statki: %d", stats.countFloatingShips(boardType)))
         };
     }
 

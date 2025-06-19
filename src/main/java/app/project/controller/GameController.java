@@ -9,6 +9,7 @@ import app.project.controller.networking.SocketNetworkHandler;
 import app.project.model.BoardType;
 
 import java.awt.*;
+import java.util.Objects;
 import java.util.function.*;
 
 import static app.project.model.BoardType.FOE_BOARD;
@@ -119,7 +120,7 @@ public class GameController {
     }
 
     public void setNetworkHandler(SocketNetworkHandler handler) {
-        if (this.networkHandler != null) {
+        if (Objects.nonNull(this.networkHandler)) {
             throw new IllegalStateException("NetworkHandler już istnieje.");
         }
         localEngine.setMyTurn(handler instanceof ServerHandler);

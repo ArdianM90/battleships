@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class ShipTileView extends JPanel {
@@ -18,7 +19,7 @@ public class ShipTileView extends JPanel {
         setBorder(BorderFactory.createLineBorder(Color.BLACK, (int) Math.ceil(size / 18.0)));
         setOpaque(true);
         setPreferredSize(new Dimension(size, size));
-        if (notifyClickFunction != null) {
+        if (Objects.nonNull(notifyClickFunction)) {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
