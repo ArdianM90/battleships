@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.net.Socket;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -54,7 +55,7 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
         Thread listenerThread = new Thread(() -> {
             try {
                 String msg;
-                while ((msg = inputStream.readLine()) != null) {
+                while (Objects.nonNull(msg = inputStream.readLine())) {
                     System.out.println("Klient otrzymał: " + msg);
                     if (msg.equals("START")) {
                         SwingUtilities.invokeLater(goToGameFunction);

@@ -7,6 +7,7 @@ import java.io.*;
 import java.awt.Point;
 import java.net.Socket;
 import java.net.ServerSocket;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -24,11 +25,13 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
     private boolean gameStarted = false;
 
     private ServerSocket serverSocket;
+    private Socket clientSocket;
     private BufferedReader inputStream;
     private PrintWriter outputStream;
 
     public ServerHandler(int port, Runnable goToGameFunction, Consumer<Boolean[][]> setOpponentShipsFunction, BiConsumer<BoardType, Point> receiveShotFunction) {
         this.serverSocket = null;
+        this.clientSocket = null;
         this.port = port;
         this.goToGameFunction = goToGameFunction;
         this.setOpponentShipsFunction = setOpponentShipsFunction;
@@ -51,7 +54,7 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
     }
 
     private void initConnection(ServerSocket serverSocket) throws IOException {
-        Socket clientSocket = serverSocket.accept();
+        clientSocket = serverSocket.accept();
         System.out.println("Klient połączony.");
         inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         outputStream = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -61,7 +64,7 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
         Thread listenerThread = new Thread(() -> {
             try {
                 String msg;
-                while ((msg = inputStream.readLine()) != null) {
+                while (Objects.nonNull(msg = inputStream.readLine())) {
                     System.out.println("Serwer otrzymał: " + msg);
                     if (msg.startsWith("READY")) {
                         Boolean[][] opponentShips = NetworkUtils.readyMsgToShipsArray(msg);
@@ -88,6 +91,10 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
             outputStream.println("START");
             SwingUtilities.invokeLater(goToGameFunction);
         }
+    }
+
+    public boolean isClientConnected() {
+        return Objects.nonNull(clientSocket);
     }
 
     @Override
