@@ -145,4 +145,11 @@ public class GameController {
     public GameStats getStats() {
         return this.gameStats;
     }
+
+    public boolean isClientConnected() {
+        if (networkHandler instanceof ServerHandler serverHandler) {
+            return serverHandler.isClientConnected();
+        }
+        return true;
+    }
 }

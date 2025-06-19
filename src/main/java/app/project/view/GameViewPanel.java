@@ -24,8 +24,10 @@ public class GameViewPanel extends JPanel {
 
     public GameViewPanel(GameController gameController) {
         this.countHitsQtyFunction = gameController.getCountSunkenShipsFunction();
-        this.myBoardView = new BoardView(PLAYER_BOARD, gameController.getBoardSize(), gameController.getIsShipFunction(PLAYER_BOARD), gameController::handleBoardClick);
-        this.foeBoardView = new BoardView(FOE_BOARD, gameController.getBoardSize(), gameController.getIsShipFunction(FOE_BOARD), gameController::handleBoardClick);
+        this.myBoardView = new BoardView(PLAYER_BOARD, gameController.getBoardSize(),
+                gameController.getIsShipFunction(PLAYER_BOARD), gameController::handleBoardClick);
+        this.foeBoardView = new BoardView(FOE_BOARD, gameController.getBoardSize(),
+                gameController.getIsShipFunction(FOE_BOARD), gameController::handleBoardClick);
         this.myBoardLabel = new JLabel("", SwingConstants.CENTER);
         this.foeBoardLabel = new JLabel("", SwingConstants.CENTER);
         this.shipsPerBoardQty = gameController.getShipsPerBoardQty();
@@ -75,9 +77,7 @@ public class GameViewPanel extends JPanel {
         switch (boardType) {
             case FOE_BOARD -> foeBoardLabel.setText("Plansza przeciwnika: " + hitsQty + "/" + shipsGty + " trafionych");
             case PLAYER_BOARD -> myBoardLabel.setText("Twoja plansza: " + hitsQty + "/" + shipsGty + " trafionych");
-            default -> throw new IllegalArgumentException(
-                    "Błąd podczas generowania nagłówka planszy - niepoprawny typ planszy: " + boardType
-            );
+            default -> throw new IllegalArgumentException("Błąd podczas generowania nagłówka planszy - niepoprawny typ planszy: " + boardType);
         }
     }
 

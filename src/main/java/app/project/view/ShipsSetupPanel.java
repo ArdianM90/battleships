@@ -45,8 +45,12 @@ public class ShipsSetupPanel extends JPanel {
         add(readyButton, BorderLayout.SOUTH);
 
         readyButton.addActionListener(_ -> {
-            gameController.notifySetupReadiness();
-            readyButton.setEnabled(false);
+            if (gameController.isServer() && !gameController.isClientConnected()) {
+                JOptionPane.showConfirmDialog(this, "Nie można jeszcze rozpocząć gry. Poczekaj aż klient połączy się z twoim serwerem.", "Klient nie jest połączony", JOptionPane.DEFAULT_OPTION);
+            } else {
+                gameController.notifySetupReadiness();
+                readyButton.setEnabled(false);
+            }
         });
     }
 
