@@ -2,11 +2,9 @@ package app.project.controller;
 
 import app.project.controller.local.GameEngine;
 import app.project.controller.local.GameStats;
-import app.project.controller.networking.ClientHandler;
-import app.project.controller.networking.NetworkUtils;
-import app.project.controller.networking.ServerHandler;
-import app.project.controller.networking.SocketNetworkHandler;
+import app.project.controller.networking.*;
 import app.project.model.BoardType;
+import app.project.model.GameInitData;
 
 import java.awt.*;
 import java.util.function.*;
@@ -20,7 +18,6 @@ public class GameController {
     private final Runnable gotoSummaryFunction;
 
     private GameStats gameStats;
-
     private SocketNetworkHandler networkHandler;
     private Consumer<Point> shipsSetupClickCallback;
     private BiConsumer<BoardType, Point> drawShotCallback;
@@ -31,8 +28,15 @@ public class GameController {
         this.gotoSummaryFunction = gotoSummaryFunction;
     }
 
+    public void createServer(int port, Runnable goToGameFunction, Runnable goToSetupFunction) {
+        ServerHandler server = new ServerHandler(port, goToGameFunction, this::setOpponentData, this::proceedShot);
+        server.start();
+        setNetworkHandler(server);
+        goToSetupFunction.run();
+    }
+
     public void createClientSocket(String host, int port, Runnable goToSetupFunction, Runnable goToGameFunction, Runnable showErrorFunction) {
-        ClientHandler client = new ClientHandler(host, port, goToSetupFunction, goToGameFunction, showErrorFunction, this::setOpponentShipsState, this::proceedShot);
+        ClientHandler client = new ClientHandler(host, port, goToSetupFunction, goToGameFunction, showErrorFunction, this::setOpponentData, this::proceedShot);
         client.start();
         setNetworkHandler(client);
     }
@@ -47,9 +51,9 @@ public class GameController {
         }
     }
 
-    public void notifySetupReadiness() {
+    public void notifySetupReadiness(String playerName) {
         String shipsPositionsString = NetworkUtils.shipsArrayToString(localEngine.getMyShipPositions());
-        networkHandler.notifySetupReadiness(shipsPositionsString);
+        networkHandler.notifySetupReadiness(playerName, shipsPositionsString);
     }
 
     public void handleBoardClick(BoardType boardType, Point point) {
@@ -126,8 +130,17 @@ public class GameController {
         this.networkHandler = handler;
     }
 
-    public void setOpponentShipsState(Boolean[][] shipsState) {
-        localEngine.saveOpponentShips(shipsState);
+    public void setOpponentData(GameInitData opponentData) {
+        localEngine.setOpponentName(opponentData.name());
+        localEngine.saveOpponentShips(opponentData.shipsArray());
+    }
+
+    public void setPlayerName(String name) {
+        localEngine.setPlayerName(name);
+    }
+
+    public String getOpponentName() {
+        return localEngine.getOpponentName();
     }
 
     public int getBoardSize() {
@@ -139,7 +152,7 @@ public class GameController {
     }
 
     public void startTimer() {
-        this.gameStats = new GameStats();
+        this.gameStats = new GameStats(localEngine.getPlayerName(), localEngine.getOpponentName());
     }
 
     public GameStats getStats() {

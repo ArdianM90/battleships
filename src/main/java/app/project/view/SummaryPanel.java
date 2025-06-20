@@ -14,14 +14,18 @@ public class SummaryPanel extends JPanel {
 
     private final BoardView myBoardView;
     private final BoardView foeBoardView;
-    private final JLabel myBoardLabel = new JLabel("Twoja plansza", SwingConstants.CENTER);
-    private final JLabel foeBoardLabel = new JLabel("Plansza przeciwnika", SwingConstants.CENTER);
-    private final JLabel myShotsLabel = new JLabel("Twoje strzały", SwingConstants.CENTER);
-    private final JLabel foeShotsLabel = new JLabel("Strzały przeciwnika", SwingConstants.CENTER);
+    private final JLabel myBoardLabel;
+    private final JLabel foeBoardLabel;
+    private final JLabel myShotsLabel;
+    private final JLabel foeShotsLabel;
 
     public SummaryPanel(int boardSize, GameStats stats) {
         this.myBoardView = new BoardView(PLAYER_BOARD, boardSize, stats.getBoardState(PLAYER_BOARD));
         this.foeBoardView = new BoardView(FOE_BOARD, boardSize, stats.getBoardState(FOE_BOARD));
+        this.myBoardLabel = new JLabel("Plansza gracza " + stats.getPlayerName(), SwingConstants.CENTER);
+        this.foeBoardLabel = new JLabel("Plansza gracza " + stats.getOpponentName(), SwingConstants.CENTER);
+        this.myShotsLabel = new JLabel("Twoje strzały", SwingConstants.CENTER);
+        this.foeShotsLabel = new JLabel("Strzały gracza " + stats.getOpponentName(), SwingConstants.CENTER);
         initComponents(stats);
     }
 
@@ -30,7 +34,7 @@ public class SummaryPanel extends JPanel {
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 
-        JLabel winnerLabel = new JLabel(stats.isWinner() ? "Wygrałeś" : "Wygrał przeciwnik");
+        JLabel winnerLabel = new JLabel(stats.isWinner() ? "Wygrałeś" : ("Wygrał gracz " + stats.getOpponentName().toUpperCase()));
         winnerLabel.setFont(winnerLabel.getFont().deriveFont(Font.BOLD, 22f));
         winnerLabel.setForeground(stats.isWinner() ? Color.GREEN.darker() : Color.RED);
         winnerLabel.setHorizontalAlignment(SwingConstants.CENTER);

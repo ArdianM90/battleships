@@ -1,7 +1,6 @@
 package app.project.view;
 
 import app.project.controller.GameController;
-import app.project.controller.networking.ServerHandler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,16 +49,12 @@ public class MainMenuPanel extends JPanel {
     }
 
     private void serverOnClickAction() {
-        // todo: przenieść logikę sieciową do kontrolera
-        ServerHandler server = new ServerHandler(PORT, goToGameFunction, gameController::setOpponentShipsState, gameController::proceedShot);
-        server.start();
-        gameController.setNetworkHandler(server);
+        gameController.createServer(PORT, goToGameFunction, goToSetupFunction);
         System.out.println("Serwer przechodzi do edycji.");
-        goToSetupFunction.run();
     }
 
     private void clientOnClickAction() {
-        gameController.createClientSocket(HOST, PORT, goToSetupFunction, goToGameFunction,  this::showErrorMsgDialog);
+        gameController.createClientSocket(HOST, PORT, goToSetupFunction, goToGameFunction, this::showErrorMsgDialog);
         System.out.println("Klient przechodzi do edycji.");
     }
 

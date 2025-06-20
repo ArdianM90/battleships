@@ -1,5 +1,7 @@
 package app.project.controller.networking;
 
+import app.project.model.GameInitData;
+
 import java.awt.*;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -10,16 +12,27 @@ public class NetworkUtils {
     private static final String SHIP_MARK = "X";
     private static final String NO_SHIP_MARK = "O";
 
-    public static Boolean[][] readyMsgToShipsArray(String msg) {
-        String[] stringArr = msg.substring(msg.indexOf('[') + 1, msg.length() - 1).split(",");
+    public static GameInitData readyMsgToInitData(String msg) {
+        String[] stringArr = extractShipsArray(msg);
+        String opponentName = extractName(msg);
         int shipsArrSize = (int) Math.sqrt(stringArr.length);
-        Boolean[][] result = new Boolean[shipsArrSize][shipsArrSize];
+        Boolean[][] shipsArray = new Boolean[shipsArrSize][shipsArrSize];
         for (int row = 0; row < shipsArrSize; row++) {
             for (int col = 0; col < shipsArrSize; col++) {
-                result[row][col] = SHIP_MARK.equals(stringArr[row * shipsArrSize + col]);
+                shipsArray[row][col] = SHIP_MARK.equals(stringArr[row * shipsArrSize + col]);
             }
         }
-        return result;
+        return new GameInitData(opponentName, shipsArray);
+    }
+
+    private static String[] extractShipsArray(String msg) {
+        int beginIdx = msg.indexOf('[') + 1;
+        int endIdx = msg.indexOf(']');
+        return msg.substring(beginIdx, endIdx).split(",");
+    }
+
+    private static String extractName(String msg) {
+        return msg.split(";")[1];
     }
 
     public static String shipsArrayToString(boolean[][] shipsState) {

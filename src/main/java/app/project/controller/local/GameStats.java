@@ -9,11 +9,15 @@ import static app.project.model.BoardType.FOE_BOARD;
 
 public class GameStats {
     private long gameTime;
+    private String playerName;
+    private String opponentName;
     private BoardTileModel[][] myBoardState = null;
     private BoardTileModel[][] foeBoardState = null;
 
-    public GameStats() {
+    public GameStats(String playerName, String opponentName) {
         this.gameTime = System.currentTimeMillis();
+        this.playerName = playerName;
+        this.opponentName = opponentName;
     }
 
     public void saveFinalState(BoardTileModel[][] myBoardState, BoardTileModel[][] foeBoardState) {
@@ -83,5 +87,13 @@ public class GameStats {
 
     public boolean isWinner() {
         return countFloatingShips(FOE_BOARD) == 0;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public String getOpponentName() {
+        return opponentName;
     }
 }

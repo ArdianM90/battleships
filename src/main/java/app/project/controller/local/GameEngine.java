@@ -12,14 +12,17 @@ public class GameEngine {
 
     private final int boardSize;
     private final int shipsQty;
-    private boolean myTurn;
     private final BoardModel myShips;
     private final BoardModel foeShips;
+
+    private boolean isMyTurn;
+    private String playerName;
+    private String opponentName;
 
     public GameEngine(int boardSize, int shipsQty) {
         this.boardSize = boardSize;
         this.shipsQty = shipsQty;
-        this.myTurn = false;
+        this.isMyTurn = false;
         this.myShips = new BoardModel(boardSize);
         this.foeShips = new BoardModel(boardSize);
     }
@@ -47,7 +50,7 @@ public class GameEngine {
             default -> throw new IllegalArgumentException("Błąd podczas obsługiwania strzału - niepoprawny typ planszy: " + targetBoard);
         };
         if (!shipHit) {
-            myTurn = !myTurn;
+            isMyTurn = !isMyTurn;
         }
     }
 
@@ -76,7 +79,7 @@ public class GameEngine {
     }
 
     public boolean isMyTurn() {
-        return myTurn;
+        return isMyTurn;
     }
 
     public boolean isShot(BoardType boardType, Point point) {
@@ -88,7 +91,7 @@ public class GameEngine {
     }
 
     public void setMyTurn(boolean myTurn) {
-        this.myTurn = myTurn;
+        this.isMyTurn = myTurn;
     }
 
     public int getBoardSize() {
@@ -105,5 +108,21 @@ public class GameEngine {
             case PLAYER_BOARD -> myShips.getCells();
             default -> null;
         };
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    public String getOpponentName() {
+        return opponentName;
+    }
+
+    public void setOpponentName(String opponentName) {
+        this.opponentName = opponentName;
     }
 }

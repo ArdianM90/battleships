@@ -5,12 +5,12 @@ import java.awt.*;
 
 import static app.project.model.AppStage.*;
 
-public class OverlayFrame extends JFrame {
+public class AppFrame extends JFrame {
 
     private final CardLayout layout;
     private final JPanel cardPanel;
 
-    public OverlayFrame() {
+    public AppFrame() {
         setTitle("BattleShips");
         setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -11,7 +11,7 @@ public class Battleships extends JFrame {
     private static final int SHIPS_QTY = 20;
 
     private final GameController gameController;
-    private final OverlayFrame overlayFrame;
+    private final AppFrame appFrame;
     private final MainMenuPanel mainMenu;
     private ShipsSetupPanel shipsSetup;
     private GameViewPanel gameView;
@@ -49,30 +49,30 @@ public class Battleships extends JFrame {
 
     public Battleships() {
         gameController = new GameController(BOARD_SIZE, SHIPS_QTY, this::goToSummaryPanel);
-        overlayFrame = new OverlayFrame();
+        appFrame = new AppFrame();
         mainMenu = new MainMenuPanel(gameController, this::goToShipsSetupPanel, this::goToGamePanel);
         shipsSetup = new ShipsSetupPanel(gameController);
 
-        overlayFrame.addPanel(mainMenu);
-        overlayFrame.setVisible(true);
+        appFrame.addPanel(mainMenu);
+        appFrame.setVisible(true);
     }
 
     private void goToShipsSetupPanel() {
-        gameController.loadInitialShipsPositions(gameController.isServer() ? initialServerShipSetup : initialClientShipSetup); // for tests only
+        gameController.loadInitialShipsPositions(gameController.isServer() ? initialServerShipSetup : initialClientShipSetup);
         shipsSetup = new ShipsSetupPanel(gameController);
-        overlayFrame.addPanel(shipsSetup);
-        overlayFrame.switchToShipsSetupPanel();
+        appFrame.addPanel(shipsSetup);
+        appFrame.switchToShipsSetupPanel();
     }
 
     private void goToGamePanel() {
         gameView = new GameViewPanel(gameController);
-        overlayFrame.addPanel(gameView);
-        overlayFrame.switchToGamePanel();
+        appFrame.addPanel(gameView);
+        appFrame.switchToGamePanel();
     }
 
     private void goToSummaryPanel() {
         summaryView = new SummaryPanel(gameController.getBoardSize(), gameController.getStats());
-        overlayFrame.addPanel(summaryView);
-        overlayFrame.switchToSummaryPanel();
+        appFrame.addPanel(summaryView);
+        appFrame.switchToSummaryPanel();
     }
 }

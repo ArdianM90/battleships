@@ -61,11 +61,9 @@ public class BoardView extends JPanel {
 
     public void toggleShip(Point point) {
         shipsArr[point.x][point.y].setRed(isShipFunction.test(point));
-        shipsArr[point.x][point.y].repaint();
     }
 
     public void drawShot(Point point) {
         shipsArr[point.x][point.y].drawShot();
-        shipsArr[point.x][point.y].repaint();
     }
 }

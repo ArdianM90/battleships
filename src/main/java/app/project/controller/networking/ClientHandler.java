@@ -1,6 +1,7 @@
 package app.project.controller.networking;
 
 import app.project.model.BoardType;
+import app.project.model.GameInitData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,21 +20,21 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
     private final Runnable goToSetupFunction;
     private final Runnable goToGameFunction;
     private final Runnable showErrorFunction;
-    private final Consumer<Boolean[][]> setOpponentShipsFunction;
+    private final Consumer<GameInitData> setOpponentDataFunction;
     private final BiConsumer<BoardType, Point> receiveShotFunction;
 
     private Socket socket;
     private PrintWriter outputStream;
     private BufferedReader inputStream;
 
-    public ClientHandler(String host, int port, Runnable goToSetupFunction, Runnable goToGameFunction, Runnable showErrorFunction, Consumer<Boolean[][]> setOpponentShipsFunction, BiConsumer<BoardType, Point> receiveShotFunction) {
+    public ClientHandler(String host, int port, Runnable goToSetupFunction, Runnable goToGameFunction, Runnable showErrorFunction, Consumer<GameInitData> setOpponentDataFunction, BiConsumer<BoardType, Point> receiveShotFunction) {
         this.socket = null;
         this.host = host;
         this.port = port;
         this.goToSetupFunction = goToSetupFunction;
         this.goToGameFunction = goToGameFunction;
         this.showErrorFunction = showErrorFunction;
-        this.setOpponentShipsFunction = setOpponentShipsFunction;
+        this.setOpponentDataFunction = setOpponentDataFunction;
         this.receiveShotFunction = receiveShotFunction;
     }
 
@@ -65,8 +66,8 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
                     if (msg.equals("START")) {
                         SwingUtilities.invokeLater(goToGameFunction);
                     } else if (msg.startsWith("READY")) {
-                        Boolean[][] opponentShips = NetworkUtils.readyMsgToShipsArray(msg);
-                        setOpponentShipsFunction.accept(opponentShips);
+                        GameInitData opponentData = NetworkUtils.readyMsgToInitData(msg);
+                        setOpponentDataFunction.accept(opponentData);
                     } else if (msg.startsWith("SHOT")) {
                         Point point = NetworkUtils.shotMsgToPoint(msg);
                         receiveShotFunction.accept(PLAYER_BOARD, point);
@@ -87,7 +88,7 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
     }
 
     @Override
-    public void notifySetupReadiness(String shipsStateMsg) {
-        outputStream.println("READY["+shipsStateMsg+"]");
+    public void notifySetupReadiness(String playerName, String shipsStateMsg) {
+        outputStream.println("READY["+shipsStateMsg+"];"+playerName);
     }
 }

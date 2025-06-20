@@ -22,7 +22,7 @@ public class ShipTileView extends JPanel {
         if (Objects.nonNull(notifyClickFunction)) {
             addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mousePressed(MouseEvent e) {
                     notifyClickFunction.run();
                 }
             });
@@ -31,10 +31,12 @@ public class ShipTileView extends JPanel {
 
     public void setRed(boolean red) {
         setBackground(red ? Color.RED : Color.BLUE);
+        repaint();
     }
 
     public void drawShot() {
         this.isShot = true;
+        repaint();
     }
 
     @Override

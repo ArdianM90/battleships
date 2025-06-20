@@ -18,6 +18,7 @@ public class GameViewPanel extends JPanel {
     private final BoardView foeBoardView;
     private final JLabel myBoardLabel;
     private final JLabel foeBoardLabel;
+    private final String opponentName;
     private final int shipsPerBoardQty;
 
     private JLabel turnLabel;
@@ -31,6 +32,7 @@ public class GameViewPanel extends JPanel {
         this.myBoardLabel = new JLabel("", SwingConstants.CENTER);
         this.foeBoardLabel = new JLabel("", SwingConstants.CENTER);
         this.shipsPerBoardQty = gameController.getShipsPerBoardQty();
+        this.opponentName = gameController.getOpponentName();
         gameController.setDrawShotCallback(this::drawShotOnBoard);
         gameController.setTurnLabelCallback(this::switchTurnLabel);
         gameController.startTimer();
@@ -69,7 +71,7 @@ public class GameViewPanel extends JPanel {
     }
 
     public void switchTurnLabel(boolean myTurn) {
-        turnLabel.setText(myTurn ? "TWOJA TURA" : "TURA PRZECIWNIKA");
+        turnLabel.setText(myTurn ? "TWOJA TURA" : "TURA GRACZA " + opponentName.toUpperCase());
         turnLabel.setForeground(myTurn ? Color.GREEN.darker() : Color.RED);
     }
 
