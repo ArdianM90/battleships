@@ -1,4 +1,4 @@
-package app.project.controller.networking;
+package app.project.utils;
 
 import app.project.model.GameInitData;
 

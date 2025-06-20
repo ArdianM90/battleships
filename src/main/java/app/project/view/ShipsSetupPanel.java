@@ -1,6 +1,7 @@
 package app.project.view;
 
 import app.project.controller.GameController;
+import app.project.utils.ValidationUtils;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -55,7 +56,7 @@ public class ShipsSetupPanel extends JPanel {
 
         JPanel boardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         boardPanel.add(boardView);
-        JLabel infoLabel = new JLabel("Rozmieść swoje statki, naciśnij GOTOWE. Gra rozpocznie się gdy obaj gracze zgłoszą gotowość.");
+        JLabel infoLabel = new JLabel("Rozmieść swoje statki i naciśnij GOTOWE. Gra rozpocznie się gdy obaj gracze zgłoszą gotowość.");
         infoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         centerPanel.add(boardPanel);
         centerPanel.add(infoLabel);
@@ -69,7 +70,7 @@ public class ShipsSetupPanel extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
 
         readyButton.addActionListener(_ -> {
-            if (!nameIsValid(nickInput.getText())) {
+            if (!ValidationUtils.nameIsValid(nickInput.getText())) {
                 nickInput.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
                 nickInput.setBackground(new Color(255, 228, 225));
                 return;
@@ -85,19 +86,13 @@ public class ShipsSetupPanel extends JPanel {
     }
 
     private void validateNameInput(String name) {;
-        if (nameIsValid(name)) {
+        if (ValidationUtils.nameIsValid(name)) {
             nickInput.setBorder(defaultBorder);
             nickInput.setBackground(Color.WHITE);
         } else {
             nickInput.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
             nickInput.setBackground(new Color(255, 228, 225));
         }
-    }
-
-    private boolean nameIsValid(String name) {
-        boolean isEmpty = name.trim().isEmpty();
-        boolean hasForbiddenChars = name.trim().matches(".*[\\[\\];].*");
-        return !isEmpty && !hasForbiddenChars;
     }
 
     private void handleSetupBoardClick(Point point) {
