@@ -25,6 +25,13 @@ public class BoardModel {
         return boardStateArr;
     }
 
+    public int countShips() {
+        return Arrays.stream(shipCells)
+                .flatMap(Arrays::stream)
+                .mapToInt(e -> e.isShip() ? 1 : 0)
+                .sum();
+    }
+
     public int countHitShips() {
         return Arrays.stream(shipCells)
                 .flatMap(Arrays::stream)

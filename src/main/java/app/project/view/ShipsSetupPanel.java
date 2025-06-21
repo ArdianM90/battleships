@@ -20,6 +20,10 @@ public class ShipsSetupPanel extends JPanel {
     private final JTextField nickInput;
     private final Border defaultBorder;
 
+    private boolean submitted = false;
+    private JButton readyButton;
+    private JLabel shipsQtyLabel;
+
     public ShipsSetupPanel(GameSettings settings, GameController gameController) {
         this.settings = settings;
         this.gameController = gameController;
@@ -57,36 +61,28 @@ public class ShipsSetupPanel extends JPanel {
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
         JPanel boardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         boardPanel.add(boardView);
         JLabel infoLabel = new JLabel("Rozmieść swoje statki i naciśnij GOTOWE. Gra rozpocznie się gdy obaj gracze zgłoszą gotowość.");
         infoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        shipsQtyLabel = new JLabel("Ustawiono " + gameController.countPlacedShips() + " z " + GameSettings.SHIPS_QTY + " statków.", SwingConstants.CENTER);
+        shipsQtyLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        shipsQtyLabel.setFont(shipsQtyLabel.getFont().deriveFont(Font.BOLD, 18f));
+        shipsQtyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(shipsQtyLabel);
+        centerPanel.add(Box.createVerticalStrut(20));
         centerPanel.add(boardPanel);
         centerPanel.add(infoLabel);
         add(centerPanel, BorderLayout.CENTER);
 
-        JButton readyButton = new JButton("Gotowe");
+        readyButton = new JButton("Gotowe");
         readyButton.setPreferredSize(new Dimension(200, 40));
+        readyButton.setEnabled(gameController.countPlacedShips() == GameSettings.SHIPS_QTY);
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         bottomPanel.add(readyButton);
         add(bottomPanel, BorderLayout.SOUTH);
-
-        readyButton.addActionListener(_ -> {
-            if (!ValidationUtils.nameIsValid(nickInput.getText())) {
-                nickInput.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-                nickInput.setBackground(new Color(255, 228, 225));
-                return;
-            }
-            if (gameController.isServer() && !gameController.isClientConnected()) {
-                JOptionPane.showConfirmDialog(this, "Nie można jeszcze rozpocząć gry. Poczekaj aż klient połączy się z twoim serwerem.", "Klient nie jest połączony", JOptionPane.DEFAULT_OPTION);
-            } else {
-                gameController.setPlayerName(nickInput.getText());
-                gameController.notifySetupReadiness(nickInput.getText());
-                readyButton.setEnabled(false);
-            }
-        });
+        readyButton.addActionListener(_ -> handleReadySubmit());
     }
 
     private void validateNameInput(String name) {
@@ -99,7 +95,34 @@ public class ShipsSetupPanel extends JPanel {
         }
     }
 
+    private void handleReadySubmit() {
+        if (submitted) {
+            return;
+        }
+        if (!ValidationUtils.nameIsValid(nickInput.getText())) {
+            nickInput.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+            nickInput.setBackground(new Color(255, 228, 225));
+            return;
+        }
+        if (gameController.isServer() && !gameController.isClientConnected()) {
+            JOptionPane.showConfirmDialog(this, "Nie można jeszcze rozpocząć gry. Poczekaj aż klient połączy się z twoim serwerem.", "Klient nie jest połączony", JOptionPane.DEFAULT_OPTION);
+        } else {
+            nickInput.setEditable(false);
+            gameController.setPlayerName(nickInput.getText());
+            gameController.notifySetupReadiness(nickInput.getText());
+            readyButton.setEnabled(false);
+            submitted = true;
+        }
+    }
+
     private void handleSetupBoardClick(Point point) {
+        if (submitted) {
+            return;
+        }
         boardView.toggleShip(point);
+        int shipsQty = gameController.countPlacedShips();
+        shipsQtyLabel.setText("Ustawiono " + shipsQty + " z " + GameSettings.SHIPS_QTY + " statków.");
+        shipsQtyLabel.setForeground(shipsQty > GameSettings.SHIPS_QTY ? Color.RED : Color.BLACK);
+        readyButton.setEnabled(shipsQty == GameSettings.SHIPS_QTY);
     }
 }

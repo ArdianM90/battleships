@@ -44,6 +44,7 @@ public class GameViewPanel extends JPanel {
         JPanel topPanel = new JPanel(new BorderLayout());
         this.turnLabel = new JLabel(isMyTurn ? "TWOJA TURA" : "PRZECIWNIK ZACZYNA", SwingConstants.CENTER);
         turnLabel.setForeground(isMyTurn ? Color.GREEN.darker() : Color.RED);
+        turnLabel.setBorder(BorderFactory.createEmptyBorder(40, 0, 0, 0));
         turnLabel.setFont(turnLabel.getFont().deriveFont(Font.BOLD, 18f));
         topPanel.add(turnLabel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);

@@ -63,6 +63,13 @@ public class GameEngine {
         return myShips.getShipPositions();
     }
 
+    public int countShips(BoardType boardType) {
+        return switch (boardType) {
+            case FOE_BOARD -> foeShips.countShips();
+            case PLAYER_BOARD, SETUP_BOARD -> myShips.countShips();
+        };
+    }
+
     public int countSunkenShips(BoardType boardType) {
         return switch (boardType) {
             case FOE_BOARD -> foeShips.countHitShips();

@@ -117,6 +117,11 @@ public class GameController {
         return localEngine::countSunkenShips;
     }
 
+    public int countPlacedShips() {
+        System.out.println("Liczę statki: " + localEngine.countShips(BoardType.SETUP_BOARD));
+        return localEngine.countShips(BoardType.SETUP_BOARD);
+    }
+
     public Boolean isServer() {
         if (networkHandler instanceof ServerHandler) {
             return true;
