@@ -1,7 +1,4 @@
-package app.project.controller.local;
-
-import app.project.model.BoardTileModel;
-import app.project.model.BoardType;
+package app.project.model;
 
 import java.util.Arrays;
 

@@ -1,6 +1,6 @@
 package app.project.view;
 
-import app.project.controller.local.GameStats;
+import app.project.model.GameStats;
 import app.project.model.BoardType;
 
 import javax.swing.*;
@@ -19,9 +19,9 @@ public class SummaryPanel extends JPanel {
     private final JLabel myShotsLabel;
     private final JLabel foeShotsLabel;
 
-    public SummaryPanel(int boardSize, GameStats stats) {
-        this.myBoardView = new BoardView(PLAYER_BOARD, boardSize, stats.getBoardState(PLAYER_BOARD));
-        this.foeBoardView = new BoardView(FOE_BOARD, boardSize, stats.getBoardState(FOE_BOARD));
+    public SummaryPanel(GameStats stats) {
+        this.myBoardView = new BoardView(PLAYER_BOARD, stats.getBoardState(PLAYER_BOARD));
+        this.foeBoardView = new BoardView(FOE_BOARD, stats.getBoardState(FOE_BOARD));
         this.myBoardLabel = new JLabel("Plansza gracza " + stats.getPlayerName(), SwingConstants.CENTER);
         this.foeBoardLabel = new JLabel("Plansza gracza " + stats.getOpponentName(), SwingConstants.CENTER);
         this.myShotsLabel = new JLabel("Twoje strzały", SwingConstants.CENTER);

@@ -5,10 +5,10 @@ import java.util.Arrays;
 public class BoardModel {
     private BoardTileModel[][] shipCells;
 
-    public BoardModel(int size) {
-        this.shipCells = new BoardTileModel[size][size];
-        for (int row = 0; row < size; row++) {
-            for (int col = 0; col < size; col++) {
+    public BoardModel() {
+        this.shipCells = new BoardTileModel[GameSettings.BOARD_SIZE][GameSettings.BOARD_SIZE];
+        for (int row = 0; row < GameSettings.BOARD_SIZE; row++) {
+            for (int col = 0; col < GameSettings.BOARD_SIZE; col++) {
                 shipCells[row][col] = new BoardTileModel();
             }
         }

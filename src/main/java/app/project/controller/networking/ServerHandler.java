@@ -2,6 +2,7 @@ package app.project.controller.networking;
 
 import app.project.model.BoardType;
 import app.project.model.GameInitData;
+import app.project.model.GameSettings;
 import app.project.utils.NetworkUtils;
 
 import javax.swing.*;
@@ -17,7 +18,6 @@ import static app.project.model.BoardType.PLAYER_BOARD;
 
 public class ServerHandler extends Thread implements SocketNetworkHandler {
 
-    private final int port;
     private final Runnable goToGameFunction;
     private final Consumer<GameInitData> setOpponentDataFunction;
     private final BiConsumer<BoardType, Point> receiveShotFunction;
@@ -31,10 +31,9 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
     private BufferedReader inputStream;
     private PrintWriter outputStream;
 
-    public ServerHandler(int port, Runnable goToGameFunction, Consumer<GameInitData> setOpponentDataFunction, BiConsumer<BoardType, Point> receiveShotFunction) {
+    public ServerHandler(Runnable goToGameFunction, Consumer<GameInitData> setOpponentDataFunction, BiConsumer<BoardType, Point> receiveShotFunction) {
         this.serverSocket = null;
         this.clientSocket = null;
-        this.port = port;
         this.goToGameFunction = goToGameFunction;
         this.setOpponentDataFunction = setOpponentDataFunction;
         this.receiveShotFunction = receiveShotFunction;
@@ -43,7 +42,7 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
     @Override
     public void run() {
         try {
-            serverSocket = new ServerSocket(port);
+            serverSocket = new ServerSocket(GameSettings.PORT);
             initConnection(serverSocket);
             clientMessagesListenerThread().start();
             while (!serverSetupReady) {

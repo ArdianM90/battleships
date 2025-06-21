@@ -2,6 +2,7 @@ package app.project.controller.networking;
 
 import app.project.model.BoardType;
 import app.project.model.GameInitData;
+import app.project.model.GameSettings;
 import app.project.utils.NetworkUtils;
 
 import javax.swing.*;
@@ -16,7 +17,6 @@ import static app.project.model.BoardType.PLAYER_BOARD;
 
 public class ClientHandler extends Thread implements SocketNetworkHandler {
 
-    private final int port;
     private final String host;
     private final Runnable goToSetupFunction;
     private final Runnable goToGameFunction;
@@ -28,10 +28,9 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
     private PrintWriter outputStream;
     private BufferedReader inputStream;
 
-    public ClientHandler(String host, int port, Runnable goToSetupFunction, Runnable goToGameFunction, Runnable showErrorFunction, Consumer<GameInitData> setOpponentDataFunction, BiConsumer<BoardType, Point> receiveShotFunction) {
+    public ClientHandler(GameSettings settings, Runnable goToSetupFunction, Runnable goToGameFunction, Runnable showErrorFunction, Consumer<GameInitData> setOpponentDataFunction, BiConsumer<BoardType, Point> receiveShotFunction) {
         this.socket = null;
-        this.host = host;
-        this.port = port;
+        this.host = settings.getHost();
         this.goToSetupFunction = goToSetupFunction;
         this.goToGameFunction = goToGameFunction;
         this.showErrorFunction = showErrorFunction;
@@ -42,7 +41,7 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
     @Override
     public void run() {
         try {
-            socket = new Socket(host, port);
+            socket = new Socket(host, GameSettings.PORT);
             initConnection(socket);
             SwingUtilities.invokeLater(goToSetupFunction);
             serverMessagesListenerThread().start();

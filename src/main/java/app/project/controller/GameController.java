@@ -1,7 +1,8 @@
 package app.project.controller;
 
 import app.project.controller.local.GameEngine;
-import app.project.controller.local.GameStats;
+import app.project.model.GameSettings;
+import app.project.model.GameStats;
 import app.project.controller.networking.*;
 import app.project.model.BoardType;
 import app.project.model.GameInitData;
@@ -18,33 +19,36 @@ public class GameController {
     private final GameEngine localEngine;
     private final Runnable gotoSummaryFunction;
 
+    private GameSettings settings;
     private GameStats gameStats;
     private SocketNetworkHandler networkHandler;
     private Consumer<Point> shipsSetupClickCallback;
     private BiConsumer<BoardType, Point> drawShotCallback;
     private Consumer<Boolean> turnLabelCallback;
 
-    public GameController(int boardSize, int shipsQty, Runnable gotoSummaryFunction) {
-        this.localEngine = new GameEngine(boardSize, shipsQty);
+    public GameController(GameSettings settings, Runnable gotoSummaryFunction) {
+        this.settings = settings;
+        this.localEngine = new GameEngine();
         this.gotoSummaryFunction = gotoSummaryFunction;
     }
 
-    public void createServer(int port, Runnable goToGameFunction, Runnable goToSetupFunction) {
-        ServerHandler server = new ServerHandler(port, goToGameFunction, this::setOpponentData, this::proceedShot);
+    public void createServer(Runnable goToGameFunction, Runnable goToSetupFunction) {
+        ServerHandler server = new ServerHandler(goToGameFunction, this::setOpponentData, this::proceedShot);
         server.start();
         setNetworkHandler(server);
         goToSetupFunction.run();
     }
 
-    public void createClientSocket(String host, int port, Runnable goToSetupFunction, Runnable goToGameFunction, Runnable showErrorFunction) {
-        ClientHandler client = new ClientHandler(host, port, goToSetupFunction, goToGameFunction, showErrorFunction, this::setOpponentData, this::proceedShot);
+    public void createClientSocket(String host, Runnable goToSetupFunction, Runnable goToGameFunction, Runnable showErrorFunction) {
+        settings.setHost(host);
+        ClientHandler client = new ClientHandler(settings, goToSetupFunction, goToGameFunction, showErrorFunction, this::setOpponentData, this::proceedShot);
         client.start();
         setNetworkHandler(client);
     }
 
     public void loadInitialShipsPositions(boolean[][] shipsSetup) {
-        for (int row = 0; row < getBoardSize(); row++) {
-            for (int col = 0; col < getBoardSize(); col++) {
+        for (int row = 0; row < GameSettings.BOARD_SIZE; row++) {
+            for (int col = 0; col < GameSettings.BOARD_SIZE; col++) {
                 if (shipsSetup[row][col]) {
                     handleSetupClick(new Point(row, col));
                 }
@@ -142,14 +146,6 @@ public class GameController {
 
     public String getOpponentName() {
         return localEngine.getOpponentName();
-    }
-
-    public int getBoardSize() {
-        return localEngine.getBoardSize();
-    }
-
-    public int getShipsPerBoardQty() {
-        return localEngine.getShipsQty();
     }
 
     public void startTimer() {

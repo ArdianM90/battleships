@@ -1,6 +1,7 @@
 package app.project.view;
 
 import app.project.controller.GameController;
+import app.project.model.GameSettings;
 import app.project.utils.ValidationUtils;
 
 import javax.swing.*;
@@ -13,21 +14,21 @@ import static app.project.model.AppStage.MAIN_MENU;
 
 public class MainMenuPanel extends JPanel {
 
-    private static final int PORT = 12345;
-
+    private final GameSettings settings;
     private final GameController gameController;
     private final Runnable goToSetupFunction;
     private final Runnable goToGameFunction;
 
     private JTextField ipInput;
     private Border defaultBorder;
-    private JCheckBox testModeCheckbox;
-    private JCheckBox autoPlaceCheckbox;
+    private JCheckBox initialShipsSetupCheckbx;
     private JCheckBox foeShipsVisibleCheckbox;
 
-    public MainMenuPanel(GameController gameController,
+    public MainMenuPanel(GameSettings settings,
+                         GameController gameController,
                          Runnable goToSetupFunction,
                          Runnable goToGameFunction) {
+        this.settings = settings;
         this.gameController = gameController;
         this.goToSetupFunction = goToSetupFunction;
         this.goToGameFunction = goToGameFunction;
@@ -78,14 +79,15 @@ public class MainMenuPanel extends JPanel {
     private JPanel initSettingsPanel() {
         JPanel settingsPanel = new JPanel();
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
-        settingsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        settingsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 0));
 
         JPanel ipPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         JLabel ipLabel = new JLabel("Adres IP:");
-        ipLabel.setFont(ipLabel.getFont().deriveFont(Font.PLAIN, 14));
+        ipLabel.setFont(ipLabel.getFont().deriveFont(Font.BOLD, 14));
         ipInput = new JTextField("localhost", 12);
         defaultBorder = ipInput.getBorder();
         ipInput.setFont(ipInput.getFont().deriveFont(Font.PLAIN, 14));
+        ipInput.setToolTipText("Jeśli hostujesz grę, wpisz swoje IP. Jeśli dołączasz, wpisz IP hosta. Do testów możesz użyć 'localhost'.");
         ipInput.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) { validateIpInput(ipInput.getText()); }
@@ -97,37 +99,44 @@ public class MainMenuPanel extends JPanel {
         ipPanel.add(ipLabel);
         ipPanel.add(ipInput);
         ipPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        testModeCheckbox = new JCheckBox("Włącz tryb testowy");
-        testModeCheckbox.setFont(testModeCheckbox.getFont().deriveFont(Font.PLAIN, 14));
-        testModeCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        autoPlaceCheckbox = new JCheckBox("Wstępnie ustaw statki");
-        autoPlaceCheckbox.setFont(autoPlaceCheckbox.getFont().deriveFont(Font.PLAIN, 14));
-        autoPlaceCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        foeShipsVisibleCheckbox = new JCheckBox("Pokaż statki przeciwnika");
-        foeShipsVisibleCheckbox.setFont(foeShipsVisibleCheckbox.getFont().deriveFont(Font.PLAIN, 14));
-        foeShipsVisibleCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         settingsPanel.add(ipPanel);
+
+        if (settings.isTestMode()) {
+            initialShipsSetupCheckbx = new JCheckBox("Wstępnie ustaw statki");
+            initialShipsSetupCheckbx.setFont(initialShipsSetupCheckbx.getFont().deriveFont(Font.PLAIN, 14));
+            initialShipsSetupCheckbx.setAlignmentX(Component.LEFT_ALIGNMENT);
+            initialShipsSetupCheckbx.setSelected(settings.isLoadInitialShipsSetup());
+            foeShipsVisibleCheckbox = new JCheckBox("Pokaż statki przeciwnika");
+            foeShipsVisibleCheckbox.setFont(foeShipsVisibleCheckbox.getFont().deriveFont(Font.PLAIN, 14));
+            foeShipsVisibleCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
+            foeShipsVisibleCheckbox.setSelected(settings.isShowEnemyShips());
+            settingsPanel.add(initialShipsSetupCheckbx);
+            settingsPanel.add(foeShipsVisibleCheckbox);
+
+            initialShipsSetupCheckbx.addActionListener(_ -> {
+                settings.setLoadInitialShipsSetup(initialShipsSetupCheckbx.isSelected());
+            });
+
+            foeShipsVisibleCheckbox.addActionListener(_ -> {
+                settings.setShowEnemyShips(foeShipsVisibleCheckbox.isSelected());
+            });
+        }
+
         settingsPanel.add(Box.createVerticalStrut(5));
-        settingsPanel.add(testModeCheckbox);
-        settingsPanel.add(autoPlaceCheckbox);
-        settingsPanel.add(foeShipsVisibleCheckbox);
-        settingsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 0));
         return settingsPanel;
     }
 
     private void serverOnClickAction() {
-        gameController.createServer(PORT, goToGameFunction, goToSetupFunction);
+        gameController.createServer(goToGameFunction, goToSetupFunction);
         System.out.println("Serwer przechodzi do edycji.");
     }
 
     private void clientOnClickAction() {
-        gameController.createClientSocket(ipInput.getText(), PORT, goToSetupFunction, goToGameFunction, this::showErrorMsgDialog);
+        gameController.createClientSocket(ipInput.getText(), goToSetupFunction, goToGameFunction, this::showErrorMsgDialog);
         System.out.println("Klient przechodzi do edycji.");
     }
 
-    private void validateIpInput(String ip) {;
+    private void validateIpInput(String ip) {
         if (ValidationUtils.ipIsValid(ip)) {
             ipInput.setBorder(defaultBorder);
             ipInput.setBackground(Color.WHITE);

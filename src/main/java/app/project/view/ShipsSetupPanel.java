@@ -1,6 +1,7 @@
 package app.project.view;
 
 import app.project.controller.GameController;
+import app.project.model.GameSettings;
 import app.project.utils.ValidationUtils;
 
 import javax.swing.*;
@@ -13,15 +14,17 @@ import static app.project.model.AppStage.SHIPS_SETUP;
 import static app.project.model.BoardType.SETUP_BOARD;
 
 public class ShipsSetupPanel extends JPanel {
-    private final BoardView boardView;
+    private final GameSettings settings;
     private final GameController gameController;
+    private final BoardView boardView;
     private final JTextField nickInput;
     private final Border defaultBorder;
 
-    public ShipsSetupPanel(GameController gameController) {
-        this.boardView = new BoardView(SETUP_BOARD, gameController.getBoardSize(), gameController.getIsShipFunction(SETUP_BOARD), gameController::handleBoardClick);
+    public ShipsSetupPanel(GameSettings settings, GameController gameController) {
+        this.settings = settings;
         this.gameController = gameController;
         this.gameController.setShipsSetupClickCallback(this::handleSetupBoardClick);
+        this.boardView = new BoardView(false, SETUP_BOARD, gameController.getIsShipFunction(SETUP_BOARD), gameController::handleBoardClick);
         this.nickInput = new JTextField();
         this.defaultBorder = nickInput.getBorder();
         initComponents();
@@ -36,6 +39,7 @@ public class ShipsSetupPanel extends JPanel {
         topPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         JPanel nickPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         JLabel nickLabel = new JLabel("Twój nick:");
+        nickInput.setText(settings.isTestMode() ? "Test" : "");
         nickInput.setPreferredSize(new Dimension(200, 30));
         nickInput.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -85,7 +89,7 @@ public class ShipsSetupPanel extends JPanel {
         });
     }
 
-    private void validateNameInput(String name) {;
+    private void validateNameInput(String name) {
         if (ValidationUtils.nameIsValid(name)) {
             nickInput.setBorder(defaultBorder);
             nickInput.setBackground(Color.WHITE);

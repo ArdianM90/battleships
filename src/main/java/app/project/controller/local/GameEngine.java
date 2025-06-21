@@ -3,6 +3,7 @@ package app.project.controller.local;
 import app.project.model.BoardTileModel;
 import app.project.model.BoardModel;
 import app.project.model.BoardType;
+import app.project.model.GameSettings;
 
 import java.awt.*;
 
@@ -10,8 +11,6 @@ import static app.project.model.BoardType.*;
 
 public class GameEngine {
 
-    private final int boardSize;
-    private final int shipsQty;
     private final BoardModel myShips;
     private final BoardModel foeShips;
 
@@ -19,12 +18,10 @@ public class GameEngine {
     private String playerName;
     private String opponentName;
 
-    public GameEngine(int boardSize, int shipsQty) {
-        this.boardSize = boardSize;
-        this.shipsQty = shipsQty;
+    public GameEngine() {
         this.isMyTurn = false;
-        this.myShips = new BoardModel(boardSize);
-        this.foeShips = new BoardModel(boardSize);
+        this.myShips = new BoardModel();
+        this.foeShips = new BoardModel();
     }
 
     public void toggleMyShipAt(Point point) {
@@ -32,8 +29,8 @@ public class GameEngine {
     }
 
     public void saveOpponentShips(Boolean[][] shipsState) {
-        for (int row = 0; row < boardSize; row++) {
-            for (int col = 0; col < boardSize; col++) {
+        for (int row = 0; row < GameSettings.BOARD_SIZE; row++) {
+            for (int col = 0; col < GameSettings.BOARD_SIZE; col++) {
                 if (shipsState[row][col]) {
                     foeShips.setShip(row, col);
                 }
@@ -75,7 +72,7 @@ public class GameEngine {
     }
 
     public boolean endConditionsMet() {
-        return shipsQty == countSunkenShips(PLAYER_BOARD) || shipsQty == countSunkenShips(FOE_BOARD);
+        return GameSettings.SHIPS_QTY == countSunkenShips(PLAYER_BOARD) || GameSettings.SHIPS_QTY == countSunkenShips(FOE_BOARD);
     }
 
     public boolean isMyTurn() {
@@ -92,14 +89,6 @@ public class GameEngine {
 
     public void setMyTurn(boolean myTurn) {
         this.isMyTurn = myTurn;
-    }
-
-    public int getBoardSize() {
-        return boardSize;
-    }
-
-    public int getShipsQty() {
-        return shipsQty;
     }
 
     public BoardTileModel[][] getBoardState(BoardType boardType) {

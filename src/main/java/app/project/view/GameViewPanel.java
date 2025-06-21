@@ -2,6 +2,7 @@ package app.project.view;
 
 import app.project.controller.GameController;
 import app.project.model.BoardType;
+import app.project.model.GameSettings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,19 +20,15 @@ public class GameViewPanel extends JPanel {
     private final JLabel myBoardLabel;
     private final JLabel foeBoardLabel;
     private final String opponentName;
-    private final int shipsPerBoardQty;
 
     private JLabel turnLabel;
 
-    public GameViewPanel(GameController gameController) {
+    public GameViewPanel(GameSettings settings, GameController gameController) {
         this.countHitsQtyFunction = gameController.getCountSunkenShipsFunction();
-        this.myBoardView = new BoardView(PLAYER_BOARD, gameController.getBoardSize(),
-                gameController.getIsShipFunction(PLAYER_BOARD), gameController::handleBoardClick);
-        this.foeBoardView = new BoardView(FOE_BOARD, gameController.getBoardSize(),
-                gameController.getIsShipFunction(FOE_BOARD), gameController::handleBoardClick);
+        this.myBoardView = new BoardView(settings.isShowEnemyShips(), PLAYER_BOARD, gameController.getIsShipFunction(PLAYER_BOARD), gameController::handleBoardClick);
+        this.foeBoardView = new BoardView(settings.isShowEnemyShips(), FOE_BOARD, gameController.getIsShipFunction(FOE_BOARD), gameController::handleBoardClick);
         this.myBoardLabel = new JLabel("", SwingConstants.CENTER);
         this.foeBoardLabel = new JLabel("", SwingConstants.CENTER);
-        this.shipsPerBoardQty = gameController.getShipsPerBoardQty();
         this.opponentName = gameController.getOpponentName();
         gameController.setDrawShotCallback(this::drawShotOnBoard);
         gameController.setTurnLabelCallback(this::switchTurnLabel);
@@ -55,8 +52,8 @@ public class GameViewPanel extends JPanel {
         boardsPanel.add(boardWithLabel(myBoardLabel, myBoardView));
         boardsPanel.add(boardWithLabel(foeBoardLabel, foeBoardView));
         add(boardsPanel, BorderLayout.CENTER);
-        updateBoardLabel(PLAYER_BOARD, 0, shipsPerBoardQty);
-        updateBoardLabel(FOE_BOARD, 0, shipsPerBoardQty);
+        updateBoardLabel(PLAYER_BOARD, 0);
+        updateBoardLabel(FOE_BOARD, 0);
     }
 
     private JPanel boardWithLabel(JLabel label, BoardView board) {
@@ -75,10 +72,10 @@ public class GameViewPanel extends JPanel {
         turnLabel.setForeground(myTurn ? Color.GREEN.darker() : Color.RED);
     }
 
-    public void updateBoardLabel(BoardType boardType, int hitsQty, int shipsGty) {
+    public void updateBoardLabel(BoardType boardType, int hitsQty) {
         switch (boardType) {
-            case FOE_BOARD -> foeBoardLabel.setText("Plansza przeciwnika: " + hitsQty + "/" + shipsGty + " trafionych");
-            case PLAYER_BOARD -> myBoardLabel.setText("Twoja plansza: " + hitsQty + "/" + shipsGty + " trafionych");
+            case FOE_BOARD -> foeBoardLabel.setText("Plansza przeciwnika: " + hitsQty + "/" + GameSettings.SHIPS_QTY + " trafionych");
+            case PLAYER_BOARD -> myBoardLabel.setText("Twoja plansza: " + hitsQty + "/" + GameSettings.SHIPS_QTY + " trafionych");
             default -> throw new IllegalArgumentException("Błąd podczas generowania nagłówka planszy - niepoprawny typ planszy: " + boardType);
         }
     }
@@ -87,11 +84,11 @@ public class GameViewPanel extends JPanel {
         switch (boardType) {
             case FOE_BOARD -> {
                 foeBoardView.drawShot(point);
-                updateBoardLabel(FOE_BOARD, countHitsQtyFunction.apply(boardType), shipsPerBoardQty);
+                updateBoardLabel(FOE_BOARD, countHitsQtyFunction.apply(boardType));
             }
             case PLAYER_BOARD -> {
                 myBoardView.drawShot(point);
-                updateBoardLabel(PLAYER_BOARD, countHitsQtyFunction.apply(boardType), shipsPerBoardQty);
+                updateBoardLabel(PLAYER_BOARD, countHitsQtyFunction.apply(boardType));
             }
             default -> throw new IllegalArgumentException("Nieznany typ planszy: " + boardType);
         }
