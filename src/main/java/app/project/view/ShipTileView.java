@@ -13,9 +13,9 @@ public class ShipTileView extends JPanel {
 
     private boolean isShot = false;
 
-    public ShipTileView(int size, Supplier<Boolean> isShipFunction, Runnable notifyClickFunction) {
+    public ShipTileView(int size, Supplier<Boolean> drawAsShipFunction, Runnable notifyClickFunction) {
         SHOT_MARK_GAP = (int) Math.ceil(size / 4.0);
-        setBackground(isShipFunction.get() ? Color.RED : Color.BLUE);
+        setBackground(drawAsShipFunction.get() ? Color.RED : Color.BLUE);
         setBorder(BorderFactory.createLineBorder(Color.BLACK, (int) Math.ceil(size / 18.0)));
         setOpaque(true);
         setPreferredSize(new Dimension(size, size));

@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.*;
 
+import static app.project.model.BoardType.FOE_BOARD;
+
 public class BoardView extends JPanel {
 
     private static final int BUTTON_SIZE_MID = 35;
@@ -24,15 +26,21 @@ public class BoardView extends JPanel {
         this.notifyClickFunction = notifyClickFunction;
         this.boardType = boardType;
         this.shipsArr = new ShipTileView[size][size];
+        System.out.println("Pierwszy konstruktor BoardView");
         setLayout(new GridLayout(size, size, 1, 1));
         setPreferredSize(new Dimension((BUTTON_SIZE_MID + 1) * size, (BUTTON_SIZE_MID + 1) * size));
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
                 int finalRow = row;
                 int finalCol = col;
-                Supplier<Boolean> changeColorFunction = () -> this.isShipFunction.test(new Point(finalRow, finalCol));
+                Supplier<Boolean> drawTileAsShipFunction = () -> {
+                    if (!FOE_BOARD.equals(this.boardType)) {
+                        return this.isShipFunction.test(new Point(finalRow, finalCol));
+                    }
+                    return false;
+                };
                 Runnable clickFunction = () -> this.notifyClickFunction.accept(this.boardType, new Point(finalRow, finalCol));
-                this.shipsArr[row][col] = new ShipTileView(BUTTON_SIZE_MID, changeColorFunction, clickFunction);
+                this.shipsArr[row][col] = new ShipTileView(BUTTON_SIZE_MID, drawTileAsShipFunction, clickFunction);
                 add(this.shipsArr[row][col]);
             }
         }
@@ -64,6 +72,9 @@ public class BoardView extends JPanel {
     }
 
     public void drawShot(Point point) {
+        if (FOE_BOARD.equals(boardType) && isShipFunction.test(point)) {
+            toggleShip(point);
+        }
         shipsArr[point.x][point.y].drawShot();
     }
 }
