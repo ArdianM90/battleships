@@ -50,9 +50,9 @@ public class FilesUtils {
     public static void saveGameStatsFile(GameStats stats) {
         String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         String fileSuffix = String.format("%06d", new Random().nextInt(1_000_000));
-        String filename = dateStr + "_" + fileSuffix + ".txt";
+        String filePath = "./stats/" + dateStr + "_" + fileSuffix + ".txt";
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             writer.write(dateStr);
             writer.newLine();
             writer.write(String.format("Wygrał gracz: %s", stats.getWinnerName()));
@@ -70,7 +70,7 @@ public class FilesUtils {
             long seconds = stats.getGameTimeSeconds();
             writer.write(String.format("Czas gry: %02d:%02d", seconds / 60, seconds % 60));
             writer.newLine();
-            System.out.println("Statystyki zapisane do pliku: " + filename);
+            System.out.println("Statystyki zapisane do pliku: " + filePath);
         } catch (IOException e) {
             System.out.println("Błąd podczas zapisywania statystyk do pliku: " + e.getMessage());
         }

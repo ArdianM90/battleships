@@ -27,3 +27,5 @@
 # OS/System
 .DS_Store
 Thumbs.db
+
+stats/
