@@ -46,6 +46,7 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
             SwingUtilities.invokeLater(goToSetupFunction);
             serverMessagesListenerThread().start();
         } catch (IOException e) {
+            closeConnection();
             System.err.println("Błąd klienta: " + e.getMessage());
             SwingUtilities.invokeLater(showErrorFunction);
         }
@@ -73,7 +74,9 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
                         receiveShotFunction.accept(PLAYER_BOARD, point);
                     }
                 }
+                closeConnection();
             } catch (IOException e) {
+                closeConnection();
                 System.err.println("Błąd odczytu od serwera: " + e.getMessage());
             }
         });
@@ -90,5 +93,16 @@ public class ClientHandler extends Thread implements SocketNetworkHandler {
     @Override
     public void notifySetupReadiness(String playerName, String shipsStateMsg) {
         outputStream.println("READY["+shipsStateMsg+"];"+playerName);
+    }
+
+    @Override
+    public void closeConnection() {
+        try {
+            if (inputStream != null) inputStream.close();
+            if (outputStream != null) outputStream.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
+            System.err.println("Błąd przy zamykaniu połączenia: " + e.getMessage());
+        }
     }
 }

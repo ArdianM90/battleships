@@ -6,10 +6,6 @@ import app.project.utils.FilesUtils;
 import app.project.view.*;
 
 import javax.swing.*;
-import java.io.*;
-import java.util.Objects;
-
-import static app.project.model.GameSettings.BOARD_SIZE;
 
 public class Battleships extends JFrame {
 

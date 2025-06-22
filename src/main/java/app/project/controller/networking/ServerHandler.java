@@ -49,6 +49,7 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
                 Thread.sleep(100);
             }
         } catch (Exception e) {
+            closeConnection();
             System.err.println("Błąd serwera: " + e.getMessage());
         }
     }
@@ -76,7 +77,9 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
                         receiveShotFunction.accept(PLAYER_BOARD, point);
                     }
                 }
+                closeConnection();
             } catch (IOException e) {
+                closeConnection();
                 System.err.println("Błąd odczytu od klienta: " + e.getMessage());
             }
         });
@@ -108,5 +111,17 @@ public class ServerHandler extends Thread implements SocketNetworkHandler {
         serverSetupReady = true;
         sendMessage("READY["+shipsStateMsg+"];"+playerName);
         startGameIfBothReady();
+    }
+
+    @Override
+    public void closeConnection() {
+        try {
+            if (inputStream != null) inputStream.close();
+            if (outputStream != null) outputStream.close();
+            if (clientSocket != null) clientSocket.close();
+            if (serverSocket != null) serverSocket.close();
+        } catch (IOException e) {
+            System.err.println("Błąd przy zamykaniu połączenia: " + e.getMessage());
+        }
     }
 }
