@@ -1,4 +1,4 @@
-package app.project.model;
+package app.project.model.types;
 
 public enum BoardType {
     SETUP_BOARD,

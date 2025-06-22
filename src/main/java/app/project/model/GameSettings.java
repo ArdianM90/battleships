@@ -6,7 +6,7 @@ public class GameSettings {
     public static final int BOARD_SIZE = 12;
     public static final int SHIPS_QTY = 20;
 
-    private boolean testMode;
+    private final boolean testMode;
     private boolean loadInitialShipsSetup = false;
     private boolean showEnemyShips = false;
     private String host;

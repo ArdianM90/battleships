@@ -10,7 +10,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 
-import static app.project.model.AppStage.MAIN_MENU;
+import static app.project.model.types.AppStage.MAIN_MENU;
 
 public class MainMenuPanel extends JPanel {
 

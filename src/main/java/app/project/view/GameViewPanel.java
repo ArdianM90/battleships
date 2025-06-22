@@ -1,16 +1,18 @@
 package app.project.view;
 
 import app.project.controller.GameController;
-import app.project.model.BoardType;
+import app.project.model.types.BoardType;
 import app.project.model.GameSettings;
+import app.project.view.board.BoardView;
+import app.project.view.board.InteractiveBoard;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.function.Function;
 
-import static app.project.model.AppStage.GAME;
-import static app.project.model.BoardType.FOE_BOARD;
-import static app.project.model.BoardType.PLAYER_BOARD;
+import static app.project.model.types.AppStage.GAME;
+import static app.project.model.types.BoardType.FOE_BOARD;
+import static app.project.model.types.BoardType.PLAYER_BOARD;
 
 public class GameViewPanel extends JPanel {
 
@@ -25,8 +27,8 @@ public class GameViewPanel extends JPanel {
 
     public GameViewPanel(GameSettings settings, GameController gameController) {
         this.countHitsQtyFunction = gameController.getCountSunkenShipsFunction();
-        this.myBoardView = new BoardView(settings.isShowEnemyShips(), PLAYER_BOARD, gameController.getIsShipFunction(PLAYER_BOARD), gameController::handleBoardClick);
-        this.foeBoardView = new BoardView(settings.isShowEnemyShips(), FOE_BOARD, gameController.getIsShipFunction(FOE_BOARD), gameController::handleBoardClick);
+        this.myBoardView = new InteractiveBoard(settings.isShowEnemyShips(), PLAYER_BOARD, gameController.getIsShipFunction(PLAYER_BOARD), gameController::handleBoardClick);
+        this.foeBoardView = new InteractiveBoard(settings.isShowEnemyShips(), FOE_BOARD, gameController.getIsShipFunction(FOE_BOARD), gameController::handleBoardClick);
         this.myBoardLabel = new JLabel("", SwingConstants.CENTER);
         this.foeBoardLabel = new JLabel("", SwingConstants.CENTER);
         this.opponentName = gameController.getOpponentName();

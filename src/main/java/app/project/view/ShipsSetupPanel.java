@@ -3,6 +3,8 @@ package app.project.view;
 import app.project.controller.GameController;
 import app.project.model.GameSettings;
 import app.project.utils.ValidationUtils;
+import app.project.view.board.BoardView;
+import app.project.view.board.InteractiveBoard;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -10,8 +12,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 
-import static app.project.model.AppStage.SHIPS_SETUP;
-import static app.project.model.BoardType.SETUP_BOARD;
+import static app.project.model.types.AppStage.SHIPS_SETUP;
+import static app.project.model.types.BoardType.SETUP_BOARD;
 
 public class ShipsSetupPanel extends JPanel {
     private final GameSettings settings;
@@ -28,7 +30,7 @@ public class ShipsSetupPanel extends JPanel {
         this.settings = settings;
         this.gameController = gameController;
         this.gameController.setShipsSetupClickCallback(this::handleSetupBoardClick);
-        this.boardView = new BoardView(false, SETUP_BOARD, gameController.getIsShipFunction(SETUP_BOARD), gameController::handleBoardClick);
+        this.boardView = new InteractiveBoard(false, SETUP_BOARD, gameController.getIsShipFunction(SETUP_BOARD), gameController::handleBoardClick);
         this.nickInput = new JTextField();
         this.defaultBorder = nickInput.getBorder();
         initComponents();

@@ -3,7 +3,7 @@ package app.project.view;
 import javax.swing.*;
 import java.awt.*;
 
-import static app.project.model.AppStage.*;
+import static app.project.model.types.AppStage.*;
 
 public class AppFrame extends JFrame {
 

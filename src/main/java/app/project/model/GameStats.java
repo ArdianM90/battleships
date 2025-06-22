@@ -1,8 +1,10 @@
 package app.project.model;
 
+import app.project.model.types.BoardType;
+
 import java.util.Arrays;
 
-import static app.project.model.BoardType.FOE_BOARD;
+import static app.project.model.types.BoardType.FOE_BOARD;
 
 public class GameStats {
     private long gameTime;

@@ -1,7 +1,7 @@
 package app.project.controller.networking;
 
-import app.project.model.BoardType;
-import app.project.model.GameInitData;
+import app.project.model.types.BoardType;
+import app.project.model.types.GameInitData;
 import app.project.model.GameSettings;
 import app.project.utils.NetworkUtils;
 
@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static app.project.model.BoardType.PLAYER_BOARD;
+import static app.project.model.types.BoardType.PLAYER_BOARD;
 
 public class ServerHandler extends Thread implements SocketNetworkHandler {
 

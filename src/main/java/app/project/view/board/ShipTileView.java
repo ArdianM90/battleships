@@ -1,4 +1,4 @@
-package app.project.view;
+package app.project.view.board;
 
 import javax.swing.*;
 import java.awt.*;

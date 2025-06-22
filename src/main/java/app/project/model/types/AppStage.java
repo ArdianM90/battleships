@@ -1,4 +1,4 @@
-package app.project.model;
+package app.project.model.types;
 
 public enum AppStage {
     MAIN_MENU,
