@@ -118,7 +118,6 @@ public class GameController {
     }
 
     public int countPlacedShips() {
-        System.out.println("Liczę statki: " + localEngine.countShips(BoardType.SETUP_BOARD));
         return localEngine.countShips(BoardType.SETUP_BOARD);
     }
 

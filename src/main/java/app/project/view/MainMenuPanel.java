@@ -21,7 +21,7 @@ public class MainMenuPanel extends JPanel {
 
     private JTextField ipInput;
     private Border defaultBorder;
-    private JCheckBox initialShipsSetupCheckbx;
+    private JCheckBox initialShipsSetupCheckbox;
     private JCheckBox foeShipsVisibleCheckbox;
 
     public MainMenuPanel(GameSettings settings,
@@ -102,19 +102,19 @@ public class MainMenuPanel extends JPanel {
         settingsPanel.add(ipPanel);
 
         if (settings.isTestMode()) {
-            initialShipsSetupCheckbx = new JCheckBox("Wstępnie ustaw statki");
-            initialShipsSetupCheckbx.setFont(initialShipsSetupCheckbx.getFont().deriveFont(Font.PLAIN, 14));
-            initialShipsSetupCheckbx.setAlignmentX(Component.LEFT_ALIGNMENT);
-            initialShipsSetupCheckbx.setSelected(settings.isLoadInitialShipsSetup());
+            initialShipsSetupCheckbox = new JCheckBox("Wstępnie ustaw statki");
+            initialShipsSetupCheckbox.setFont(initialShipsSetupCheckbox.getFont().deriveFont(Font.PLAIN, 14));
+            initialShipsSetupCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
+            initialShipsSetupCheckbox.setSelected(settings.isLoadInitialShipsSetup());
             foeShipsVisibleCheckbox = new JCheckBox("Pokaż statki przeciwnika");
             foeShipsVisibleCheckbox.setFont(foeShipsVisibleCheckbox.getFont().deriveFont(Font.PLAIN, 14));
             foeShipsVisibleCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
             foeShipsVisibleCheckbox.setSelected(settings.isShowEnemyShips());
-            settingsPanel.add(initialShipsSetupCheckbx);
+            settingsPanel.add(initialShipsSetupCheckbox);
             settingsPanel.add(foeShipsVisibleCheckbox);
 
-            initialShipsSetupCheckbx.addActionListener(_ -> {
-                settings.setLoadInitialShipsSetup(initialShipsSetupCheckbx.isSelected());
+            initialShipsSetupCheckbox.addActionListener(_ -> {
+                settings.setLoadInitialShipsSetup(initialShipsSetupCheckbox.isSelected());
             });
 
             foeShipsVisibleCheckbox.addActionListener(_ -> {
