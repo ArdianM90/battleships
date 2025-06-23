@@ -5,8 +5,9 @@ public class GameSettings {
     public static final int PORT = 12345;
     public static final int BOARD_SIZE = 12;
     public static final int SHIPS_QTY = 20;
+    public static String INITIAL_SHIP_POSITIONS_FILE = "/initial-positions.txt";
 
-    private boolean testMode;
+    private final boolean testMode;
     private boolean loadInitialShipsSetup = false;
     private boolean showEnemyShips = false;
     private String host;

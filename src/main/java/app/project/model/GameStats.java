@@ -1,8 +1,11 @@
 package app.project.model;
 
+import app.project.model.types.BoardType;
+
 import java.util.Arrays;
 
-import static app.project.model.BoardType.FOE_BOARD;
+import static app.project.model.types.BoardType.FOE_BOARD;
+import static app.project.model.types.BoardType.PLAYER_BOARD;
 
 public class GameStats {
     private long gameTime;
@@ -92,5 +95,9 @@ public class GameStats {
 
     public String getOpponentName() {
         return opponentName;
+    }
+
+    public String getWinnerName() {
+        return countFloatingShips(PLAYER_BOARD) == 0 ? opponentName : playerName;
     }
 }

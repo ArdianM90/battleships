@@ -2,11 +2,15 @@ package app.project;
 
 import app.project.controller.GameController;
 import app.project.model.GameSettings;
+import app.project.utils.FilesUtils;
 import app.project.view.*;
 
 import javax.swing.*;
 
 public class Battleships extends JFrame {
+
+    private static final String SERVER_IDENT = "server";
+    private static final String CLIENT_IDENT = "client";
 
     private final GameSettings settings;
     private final GameController gameController;
@@ -26,40 +30,11 @@ public class Battleships extends JFrame {
         this.appFrame.setVisible(true);
     }
 
-    private final boolean[][] initialServerShipSetup = {
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, true, true, true, true, false, false, false, false, false, true, false},
-            {false, false, false, false, false, false, false, false, false, false, true, false},
-            {false, true, true, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, true, false, false, true, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, true, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, true, false, false, false, false, false, false, false, true, false, false},
-            {false, true, false, false, false, false, true, false, false, true, false, false},
-            {false, true, false, true, false, false, true, false, false, true, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false}
-    };
-
-    private final boolean[][] initialClientShipSetup = {
-            {false, false, false, false, true,  true,  true,  true,  false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {true,  false, false, false, false, false, false, true, true,  true,  false, false},
-            {true,  false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, true },
-            {false, false, false, false, false, true, false, false, true, false, false, true },
-            {false, true,  true,  false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, true,  false, false, false, false, false, true, false},
-            {false, false, false, false, false, false, false, false, false, false, true, false},
-            {false, false, false, false, false, false, false, false, false, false, true, false},
-            {false, false, false, false, false, false, false, true,  false, false, false, false}
-    };
-
     private void goToShipsSetupPanel() {
         shipsSetup = new ShipsSetupPanel(settings, gameController);
         if (settings.isLoadInitialShipsSetup()) {
-            gameController.loadInitialShipsPositions(gameController.isServer() ? initialServerShipSetup : initialClientShipSetup);
+            boolean[][] positions = FilesUtils.loadShipPositions(gameController.isServer() ? SERVER_IDENT : CLIENT_IDENT);
+            gameController.loadInitialShipsPositions(positions);
         }
         appFrame.addPanel(shipsSetup);
         appFrame.switchToShipsSetupPanel();
@@ -72,6 +47,7 @@ public class Battleships extends JFrame {
     }
 
     private void goToSummaryPanel() {
+        FilesUtils.saveGameStatsFile(gameController.getStats());
         summaryView = new SummaryPanel(gameController.getStats());
         appFrame.addPanel(summaryView);
         appFrame.switchToSummaryPanel();

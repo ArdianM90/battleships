@@ -1,14 +1,16 @@
 package app.project.view;
 
 import app.project.model.GameStats;
-import app.project.model.BoardType;
+import app.project.model.types.BoardType;
+import app.project.view.board.BoardView;
+import app.project.view.board.StaticBoard;
 
 import javax.swing.*;
 import java.awt.*;
 
-import static app.project.model.AppStage.SUMMARY;
-import static app.project.model.BoardType.FOE_BOARD;
-import static app.project.model.BoardType.PLAYER_BOARD;
+import static app.project.model.types.AppStage.SUMMARY;
+import static app.project.model.types.BoardType.FOE_BOARD;
+import static app.project.model.types.BoardType.PLAYER_BOARD;
 
 public class SummaryPanel extends JPanel {
 
@@ -20,8 +22,8 @@ public class SummaryPanel extends JPanel {
     private final JLabel foeShotsLabel;
 
     public SummaryPanel(GameStats stats) {
-        this.myBoardView = new BoardView(PLAYER_BOARD, stats.getBoardState(PLAYER_BOARD));
-        this.foeBoardView = new BoardView(FOE_BOARD, stats.getBoardState(FOE_BOARD));
+        this.myBoardView = new StaticBoard(PLAYER_BOARD, stats.getBoardState(PLAYER_BOARD));
+        this.foeBoardView = new StaticBoard(FOE_BOARD, stats.getBoardState(FOE_BOARD));
         this.myBoardLabel = new JLabel("Plansza gracza " + stats.getPlayerName(), SwingConstants.CENTER);
         this.foeBoardLabel = new JLabel("Plansza gracza " + stats.getOpponentName(), SwingConstants.CENTER);
         this.myShotsLabel = new JLabel("Twoje strzały", SwingConstants.CENTER);

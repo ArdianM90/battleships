@@ -4,22 +4,22 @@ import app.project.controller.local.GameEngine;
 import app.project.model.GameSettings;
 import app.project.model.GameStats;
 import app.project.controller.networking.*;
-import app.project.model.BoardType;
-import app.project.model.GameInitData;
+import app.project.model.types.BoardType;
+import app.project.model.types.GameInitData;
 import app.project.utils.NetworkUtils;
 
 import java.awt.*;
 import java.util.function.*;
 
-import static app.project.model.BoardType.FOE_BOARD;
-import static app.project.model.BoardType.PLAYER_BOARD;
+import static app.project.model.types.BoardType.FOE_BOARD;
+import static app.project.model.types.BoardType.PLAYER_BOARD;
 
 public class GameController {
 
     private final GameEngine localEngine;
     private final Runnable gotoSummaryFunction;
+    private final GameSettings settings;
 
-    private GameSettings settings;
     private GameStats gameStats;
     private SocketNetworkHandler networkHandler;
     private Consumer<Point> shipsSetupClickCallback;
@@ -118,7 +118,6 @@ public class GameController {
     }
 
     public int countPlacedShips() {
-        System.out.println("Liczę statki: " + localEngine.countShips(BoardType.SETUP_BOARD));
         return localEngine.countShips(BoardType.SETUP_BOARD);
     }
 

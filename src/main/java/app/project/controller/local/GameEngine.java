@@ -2,12 +2,12 @@ package app.project.controller.local;
 
 import app.project.model.BoardTileModel;
 import app.project.model.BoardModel;
-import app.project.model.BoardType;
+import app.project.model.types.BoardType;
 import app.project.model.GameSettings;
 
 import java.awt.*;
 
-import static app.project.model.BoardType.*;
+import static app.project.model.types.BoardType.*;
 
 public class GameEngine {
 

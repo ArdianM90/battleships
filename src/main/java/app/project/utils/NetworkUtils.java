@@ -1,6 +1,6 @@
 package app.project.utils;
 
-import app.project.model.GameInitData;
+import app.project.model.types.GameInitData;
 
 import java.awt.*;
 import java.util.Arrays;
