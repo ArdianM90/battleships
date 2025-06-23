@@ -34,6 +34,15 @@ Gra składa się z czterech ekranów:
    - Jeśli trafisz, kontynuujesz swoją turę.
 4. **Podsumowanie** – ekran końcowy ze statystykami po zakończonej grze.
 
+<p align="center">
+  <img src="img/main_menu.jpg" width="250"/>
+  <img src="img/ships_setup.jpg" width="250"/>
+</p>
+<p align="center">
+  <img src="img/game.jpg" width="250"/>
+  <img src="img/summary.jpg" width="250"/>
+</p>
+
 Tryb testowy:
 Po uruchomieniu z flagą `--test`, menu zawiera opcje:
 - automatycznego ustawienia statków,

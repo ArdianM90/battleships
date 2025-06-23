@@ -37,6 +37,15 @@ The game consists of four screens:
     - If you hit a ship, you continue your turn.
 4. **Summary** – final screen with game statistics after the game ends.
 
+<p align="center">
+  <img src="img/main_menu.jpg" width="250"/>
+  <img src="img/ships_setup.jpg" width="250"/>
+</p>
+<p align="center">
+  <img src="img/game.jpg" width="250"/>
+  <img src="img/summary.jpg" width="250"/>
+</p>
+
 Test mode:
 When launched with the `--test` flag, the menu offers options for:
 - automatic ship placement,
