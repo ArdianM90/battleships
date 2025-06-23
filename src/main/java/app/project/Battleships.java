@@ -2,7 +2,7 @@ package app.project;
 
 import app.project.controller.GameController;
 import app.project.model.GameSettings;
-import app.project.utils.FilesUtils;
+import app.project.utils.FileUtils;
 import app.project.view.*;
 
 import javax.swing.*;
@@ -33,7 +33,7 @@ public class Battleships extends JFrame {
     private void goToShipsSetupPanel() {
         shipsSetup = new ShipsSetupPanel(settings, gameController);
         if (settings.isLoadInitialShipsSetup()) {
-            boolean[][] positions = FilesUtils.loadShipPositions(gameController.isServer() ? SERVER_IDENT : CLIENT_IDENT);
+            boolean[][] positions = FileUtils.loadShipPositions(gameController.isServer() ? SERVER_IDENT : CLIENT_IDENT);
             gameController.loadInitialShipsPositions(positions);
         }
         appFrame.addPanel(shipsSetup);
@@ -47,7 +47,7 @@ public class Battleships extends JFrame {
     }
 
     private void goToSummaryPanel() {
-        FilesUtils.saveGameStatsFile(gameController.getStats());
+        FileUtils.saveGameStatsFile(gameController.getStats());
         summaryView = new SummaryPanel(gameController.getStats());
         appFrame.addPanel(summaryView);
         appFrame.switchToSummaryPanel();

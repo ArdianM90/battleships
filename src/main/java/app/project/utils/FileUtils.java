@@ -13,10 +13,10 @@ import static app.project.model.GameSettings.BOARD_SIZE;
 import static app.project.model.types.BoardType.FOE_BOARD;
 import static app.project.model.types.BoardType.PLAYER_BOARD;
 
-public class FilesUtils {
+public class FileUtils {
 
     public static boolean[][] loadShipPositions(String playerRole) {
-        try (InputStream in = FilesUtils.class.getResourceAsStream(GameSettings.INITIAL_SHIP_POSITIONS_FILE);
+        try (InputStream in = FileUtils.class.getResourceAsStream(GameSettings.INITIAL_SHIP_POSITIONS_FILE);
              BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(in)))) {
             String line;
             while ((line = reader.readLine()) != null)
